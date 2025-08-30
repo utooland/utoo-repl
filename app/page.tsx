@@ -1,5 +1,7 @@
 'use client';
 
-import OpfsProject from "./OpfsProject";
+import "./workerHack";
 
-export default OpfsProject;
+import Project from "./Project";
+
+export default Project;
