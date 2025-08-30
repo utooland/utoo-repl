@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async headers() {
+  headers: async () => {
     return [
       {
         source: '/:path*',
@@ -21,6 +21,23 @@ const nextConfig: NextConfig = {
         ],
       },
     ]
+  },
+  webpack: (config, { isServer, dev }) => {
+
+    if (!isServer && !dev) {
+      config.optimization.splitChunks = false;
+      config.output.chunkFilename = (pathData) => {
+        return isServer
+          ? '[name].js'
+          : `static/chunks/${dev || ([
+            "worker",
+            "threadWorker",
+            "serviceWorker"
+          ].includes(pathData.chunk.name)) ? '[name]' : '[name].[contenthash]'
+          }.js`
+      };
+    }
+    return config;
   },
 };
 

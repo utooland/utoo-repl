@@ -8,9 +8,10 @@ export const serviceWorkerScope = "/preview";
 export const initializeProject = async () => {
     const projectInstance = new UtooProject({
         cwd: projectName,
-        threadWorkerUrl: "http://localhost:3000/_next/static/chunks/threadWorker.js",
+        workerUrl: `${location.origin}/_next/static/chunks/worker.js`,
+        threadWorkerUrl: `${location.origin}/_next/static/chunks/threadWorker.js`,
         serviceWorker: {
-            url: "http://localhost:3000/_next/static/chunks/serviceWorker.js",
+            url: `${location.origin}/_next/static/chunks/serviceWorker.js`,
             scope: serviceWorkerScope,
         },
     });
