@@ -13,7 +13,7 @@
     "react-dom": "19.1.0",
     "next": "15.4.5",
     "@monaco-editor/react": "^4.4.6",
-    "@utoo/web": "0.0.1-alpha.16"
+    "@utoo/web": "0.0.1-alpha.18"
   },
   "devDependencies": {
     "typescript": "^5",
