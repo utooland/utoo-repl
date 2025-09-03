@@ -3,7 +3,12 @@ import { Project as UtooProject } from "@utoo/web";
 import { FileTreeNode } from "../types";
 import { generateHtml } from "../utils/htmlGenerator";
 
-export const useBuild = (project: UtooProject | null, fileTree: FileTreeNode[], handleDirectoryExpand: (root: FileTreeNode) => Promise<void>) => {
+export const useBuild = (
+    project: UtooProject | null,
+    fileTree: FileTreeNode[],
+    handleDirectoryExpand: (root: FileTreeNode) => Promise<void>,
+    onBuildComplete: () => void
+) => {
     const [isBuilding, setIsBuilding] = useState(false);
     const [error, setError] = useState("");
 
@@ -35,6 +40,7 @@ export const useBuild = (project: UtooProject | null, fileTree: FileTreeNode[], 
                 const html = generateHtml(styles, scripts);
 
                 await project.writeFile("dist/index.html", html);
+                onBuildComplete();
 
                 const root = fileTree.find((node) => node.fullName === ".");
                 if (root) {
@@ -46,11 +52,11 @@ export const useBuild = (project: UtooProject | null, fileTree: FileTreeNode[], 
             }
         } catch (e: any) {
             console.error("Build failed: ", e);
-            setError(`Build failed: ${e.message}`);
+            setError(`Build failed: ${JSON.stringify(e)}`);
         } finally {
             setIsBuilding(false);
         }
-    }, [project, fileTree, handleDirectoryExpand]);
+    }, [project, fileTree, handleDirectoryExpand, onBuildComplete]);
 
     return { isBuilding, handleBuild, error };
 };
