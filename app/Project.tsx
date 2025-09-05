@@ -3,6 +3,9 @@ import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
 import { Panel } from "./components/Panel";
 import { Preview } from "./components/Preview";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Timer } from "./components/Timer";
 import { useBuild } from "./hooks/useBuild";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
@@ -10,13 +13,14 @@ import { useUtooProject } from "./hooks/useUtooProject";
 import "./styles.css";
 
 const Project = () => {
-  const { project, isLoading, error: projectError } = useUtooProject();
+  const { project, isLoading, error: projectError, initProgress, initMessage } = useUtooProject();
   const { fileTree, handleDirectoryExpand } = useFileTree(project);
   const {
     selectedFilePath,
     selectedFileContent,
     setSelectedFileContent,
     previewUrl,
+    updatePreviewUrl,
     fetchFileContent,
     error: fileContentError,
   } = useFileContent(project);
@@ -27,10 +31,15 @@ const Project = () => {
     isBuilding,
     handleBuild,
     error: buildError,
+    buildProgress,
+    buildMessage,
   } = useBuild(project, fileTree, handleDirectoryExpand, () => {
     if (previewRef.current) {
       previewRef.current.reload();
     }
+  }, (url: string) => {
+    // 构建完成后自动设置预览 URL
+    updatePreviewUrl(url);
   });
 
   const error = projectError || fileContentError || buildError;
@@ -38,52 +47,114 @@ const Project = () => {
   const memoizedFileTree = useMemo(() => fileTree, [fileTree]);
 
   const buildButton = (
-    <button
+    <Button
       onClick={handleBuild}
       disabled={isBuilding || !project}
-      style={{
-        padding: "0.25rem 0.75rem",
-        borderRadius: "0.375rem",
-        border: "none",
-        fontSize: "0.875rem",
-        background: isBuilding ? "#d1d5db" : "#2563eb",
-        color: "#fff",
-        fontWeight: 500,
-        cursor: isBuilding ? "not-allowed" : "pointer",
-        transition: "background 0.2s",
-      }}
+      variant="default"
+      size="sm"
+      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
     >
-      {isBuilding ? "Building..." : "Build"}
-    </button>
+      {isBuilding ? "Building..." : "Build via @utoo/web"}
+    </Button>
   );
 
+
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "row",
-        backgroundColor: "#f3f4f6",
-        fontFamily: "sans-serif",
-      }}
-    >
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
+      {/* 科技感背景装饰 */}
+      <div className="absolute inset-0 bg-gradient-radial from-purple-500/10 via-transparent to-transparent pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent pointer-events-none z-0" />
+      
+      {/* 顶部标题栏 */}
+      <div className="flex items-center justify-between px-6 py-4 bg-card/20 backdrop-blur-sm border-b border-border/30 z-10">
+        <div className="flex items-center gap-4">
+          <img 
+            src="https://avatars.githubusercontent.com/u/217533135?s=200&v=4" 
+            alt="Utoo Logo" 
+            className="w-8 h-8 rounded-lg shadow-lg"
+          />
+          <div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Utoo REPL
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              An unified toolchain for web development
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Powered by</span>
+          <a 
+            href="https://npmjs.org/@utoo/web" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="font-mono text-primary hover:text-primary/80 transition-colors"
+          >
+            @utoo/web
+          </a>
+        </div>
+      </div>
+      
+      {/* 主要内容区域 */}
+      <div className="flex-1 flex flex-row relative z-10">
       <Panel
         title="Project"
         actions={buildButton}
         style={{
           width: "25%",
           minWidth: "300px",
-          borderRight: "1px solid #e5e7eb",
         }}
         contentStyle={{ padding: "0.5rem 1rem" }}
       >
-        {isLoading && (
-          <p style={{ textAlign: "center", color: "#22c55e", fontWeight: 500 }}>
-            Installing dependencies...
-          </p>
-        )}
         {error && (
           <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>
+        )}
+        {(isLoading || (initProgress !== undefined && initProgress > 0)) && (
+          <div style={{ marginBottom: "1rem" }}>
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center", 
+              marginBottom: "0.5rem" 
+            }}>
+              <span style={{ 
+                fontSize: "0.875rem", 
+                color: "#e2e8f0", 
+                fontWeight: 500 
+              }}>
+                {initMessage || "正在初始化项目..."}
+              </span>
+              <Timer isRunning={isLoading} format="seconds" />
+            </div>
+            <Progress 
+              value={initProgress || 0} 
+              className="h-1.5 bg-secondary/20"
+            />
+          </div>
+        )}
+        {(isBuilding || (buildProgress !== undefined && buildProgress > 0)) && (
+          <div style={{ marginBottom: "1rem" }}>
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center", 
+              marginBottom: "0.5rem" 
+            }}>
+              <span style={{ 
+                fontSize: "0.875rem", 
+                color: "#e2e8f0", 
+                fontWeight: 500 
+              }}>
+                {buildMessage || "正在构建项目..."}
+              </span>
+              <Timer isRunning={isBuilding} format="seconds" />
+            </div>
+            <Progress 
+              value={buildProgress || 0} 
+              className="h-1.5 bg-secondary/20"
+            />
+          </div>
         )}
         {!isLoading && !error && (
           <ul
@@ -95,9 +166,9 @@ const Project = () => {
               alignItems: "flex-start",
             }}
           >
-            {memoizedFileTree.map((item, index) => (
+            {memoizedFileTree.map((item) => (
               <FileTreeItem
-                key={index}
+                key={item.fullName}
                 item={item}
                 onFileClick={fetchFileContent}
                 onDirectoryExpand={
@@ -115,7 +186,6 @@ const Project = () => {
         style={{
           width: "40%",
           minWidth: "320px",
-          borderRight: "1px solid #e5e7eb",
         }}
         contentStyle={{ paddingTop: "0.5rem" }}
       >
@@ -128,11 +198,24 @@ const Project = () => {
 
       <Panel
         title="Preview"
-        style={{ width: "35%", minWidth: "320px" }}
-        contentStyle={{ padding: "1rem" }}
+        style={{ 
+          width: "35%", 
+          minWidth: "320px",
+        }}
+        contentStyle={{ padding: 0 }}
       >
-        <Preview ref={previewRef} url={previewUrl} />
+        <Preview 
+          ref={previewRef} 
+          url={previewUrl}
+          isLoading={isLoading}
+          isBuilding={isBuilding}
+          initProgress={initProgress}
+          initMessage={initMessage}
+          buildProgress={buildProgress}
+          buildMessage={buildMessage}
+        />
       </Panel>
+      </div>
     </div>
   );
 };

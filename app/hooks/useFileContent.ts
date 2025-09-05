@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Project as UtooProject } from "@utoo/web";
+import type { Project as UtooProject } from "@utoo/web";
 import { serviceWorkerScope } from "../services/utooService";
 
 export const useFileContent = (project: UtooProject | null) => {
@@ -21,8 +21,9 @@ export const useFileContent = (project: UtooProject | null) => {
                 if (filePath.endsWith("dist/index.html")) {
                     setPreviewUrl(`${location.origin}${serviceWorkerScope}/${filePath}`);
                 }
-            } catch (e: any) {
-                setError(`Error reading file: ${e.message}`);
+            } catch (e: unknown) {
+                const errorMessage = e instanceof Error ? e.message : String(e);
+                setError(`Error reading file: ${errorMessage}`);
             }
         },
         [project],
@@ -32,7 +33,11 @@ export const useFileContent = (project: UtooProject | null) => {
 
     useEffect(() => {
         if (selectedFilePath) {
-            document.title = `Editing ${selectedFilePath}`;
+            // 清理文件路径，移除 ./ 前缀
+            const cleanPath = selectedFilePath.replace(/^\.\//, '');
+            document.title = `Utoo REPL - ${cleanPath}`;
+        } else {
+            document.title = 'Utoo REPL';
         }
     }, [selectedFilePath]);
 
@@ -46,8 +51,9 @@ export const useFileContent = (project: UtooProject | null) => {
                 try {
                     await project.writeFile(selectedFilePath, selectedFileContent);
                     console.log(`File ${selectedFilePath} auto-saved successfully.`);
-                } catch (e: any) {
-                    setError(`Error auto-saving file: ${e.message}`);
+                } catch (e: unknown) {
+                    const errorMessage = e instanceof Error ? e.message : String(e);
+                    setError(`Error auto-saving file: ${errorMessage}`);
                 }
             }, 300);
         }
@@ -59,11 +65,16 @@ export const useFileContent = (project: UtooProject | null) => {
         };
     }, [selectedFileContent, selectedFilePath, project]);
 
+    const updatePreviewUrl = useCallback((url: string) => {
+        setPreviewUrl(url);
+    }, []);
+
     return {
         selectedFilePath,
         selectedFileContent,
         setSelectedFileContent,
         previewUrl,
+        updatePreviewUrl,
         fetchFileContent,
         error,
     };
