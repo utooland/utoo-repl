@@ -85,7 +85,14 @@ const Project = () => {
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>Powered by</span>
-          <span className="font-mono text-primary">@utoo/web</span>
+          <a 
+            href="https://npmjs.org/@utoo/web" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="font-mono text-primary hover:text-primary/80 transition-colors"
+          >
+            @utoo/web
+          </a>
         </div>
       </div>
       
