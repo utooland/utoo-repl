@@ -44,7 +44,7 @@ export const Editor = ({ filePath, content, onContentChange }: EditorProps) => {
                 lineHeight: 1.6,
                 letterSpacing: 0.5,
                 cursorBlinking: "smooth",
-                cursorSmoothCaretAnimation: true,
+                cursorSmoothCaretAnimation: "on",
                 smoothScrolling: true,
                 wordWrap: "on",
                 automaticLayout: true,
