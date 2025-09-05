@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
-import { ProgressBar } from "./ProgressBar";
+import { Progress } from "@/components/ui/progress";
 import { Timer } from "./Timer";
 
 interface PreviewProps {
@@ -35,17 +35,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
     // 显示 loading 状态
     if (isLoading) {
         return (
-            <div style={{ 
-                height: "100%",
-                display: "flex", 
-                flexDirection: "column", 
-                justifyContent: "center", 
-                alignItems: "center",
-                color: "#9ca3af", 
-                textAlign: "center",
-                padding: "2rem",
-                background: "#f9fafb"
-            }}>
+            <div className="h-full flex flex-col justify-center items-center text-foreground text-center p-8 bg-gradient-to-br from-slate-900/90 to-purple-900/90 relative">
                 <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>
                     ⚙️
                 </div>
@@ -61,19 +51,17 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                     }}>
                         <span style={{ 
                             fontSize: "0.75rem", 
-                            color: "#6b7280", 
+                            color: "#cbd5e1", 
                             fontWeight: 500 
                         }}>
                             初始化进度
                         </span>
                         <Timer isRunning={isLoading} format="seconds" />
                     </div>
-                    <ProgressBar 
-                        progress={initProgress || 0} 
-                        animated={isLoading}
-                        color="#22c55e"
-                        height={6}
-                    />
+                                    <Progress 
+                    value={initProgress || 0} 
+                    className="h-1.5 bg-secondary/20"
+                />
                 </div>
                 <div style={{ fontSize: "0.75rem" }}>
                     请稍候，项目初始化完成后即可预览
@@ -85,17 +73,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
     // 显示构建状态
     if (isBuilding) {
         return (
-            <div style={{ 
-                height: "100%",
-                display: "flex", 
-                flexDirection: "column", 
-                justifyContent: "center", 
-                alignItems: "center",
-                color: "#9ca3af", 
-                textAlign: "center",
-                padding: "2rem",
-                background: "#f9fafb"
-            }}>
+            <div className="h-full flex flex-col justify-center items-center text-muted-foreground text-center p-8 bg-gradient-to-br from-slate-900/90 to-purple-900/90">
                 <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>
                     🔨
                 </div>
@@ -111,19 +89,17 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                     }}>
                         <span style={{ 
                             fontSize: "0.75rem", 
-                            color: "#6b7280", 
+                            color: "#cbd5e1", 
                             fontWeight: 500 
                         }}>
                             构建进度
                         </span>
                         <Timer isRunning={isBuilding} format="seconds" />
                     </div>
-                    <ProgressBar 
-                        progress={buildProgress || 0} 
-                        animated={isBuilding}
-                        color="#2563eb"
-                        height={6}
-                    />
+                                    <Progress 
+                    value={buildProgress || 0} 
+                    className="h-1.5 bg-secondary/20"
+                />
                 </div>
                 <div style={{ fontSize: "0.75rem" }}>
                     构建完成后将自动显示预览内容
@@ -134,36 +110,17 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
 
     // 显示预览内容
     return (
-        <div style={{ 
-            height: "100%",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column"
-        }}>
+        <div className="h-full w-full flex flex-col">
             {/* 预览内容 */}
             {url ? (
                 <iframe
                     ref={iframeRef}
                     src={url}
                     title="preview"
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        background: "#fff",
-                    }}
+                    className="w-full h-full border-0 bg-background"
                 />
             ) : (
-                <div style={{ 
-                    height: "100%",
-                    display: "flex", 
-                    flexDirection: "column", 
-                    justifyContent: "center", 
-                    alignItems: "center",
-                    color: "#9ca3af", 
-                    textAlign: "center",
-                    padding: "2rem",
-                    background: "#f9fafb"
-                }}>
+                            <div className="h-full flex flex-col justify-center items-center text-muted-foreground text-center p-8 bg-gradient-to-br from-slate-900/90 to-purple-900/90">
                     <div style={{ fontSize: "1.125rem", marginBottom: "0.5rem" }}>
                         📄
                     </div>

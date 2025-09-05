@@ -28,11 +28,11 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
           alignItems: 'center',
           marginBottom: '0.5rem',
           fontSize: '0.875rem',
-          color: '#374151'
+          color: '#e2e8f0'
         }}>
           <span>{label}</span>
           {showPercentage && (
-            <span style={{ fontWeight: 500, color: '#6b7280' }}>
+            <span style={{ fontWeight: 500, color: '#cbd5e1' }}>
               {Math.round(clampedProgress)}%
             </span>
           )}

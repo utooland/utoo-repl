@@ -58,9 +58,9 @@ export const Timer: React.FC<TimerProps> = ({
   return (
     <span
       style={{
-        fontFamily: 'monospace',
+        fontFamily: 'var(--font-jetbrains-mono), "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Monaco, monospace',
         fontSize: '0.875rem',
-        color: '#6b7280',
+        color: '#cbd5e1',
         fontWeight: 500,
         ...style,
       }}

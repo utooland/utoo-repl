@@ -34,11 +34,20 @@ export const Editor = ({ filePath, content, onContentChange }: EditorProps) => {
             }
             value={content}
             onChange={(value) => onContentChange(value || "")}
+            theme="vs-dark"
             options={{
                 readOnly: false,
                 fontSize: 14,
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
+                fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Monaco, 'Inconsolata', 'Roboto Mono', monospace",
+                lineHeight: 1.6,
+                letterSpacing: 0.5,
+                cursorBlinking: "smooth",
+                cursorSmoothCaretAnimation: true,
+                smoothScrolling: true,
+                wordWrap: "on",
+                automaticLayout: true,
             }}
         />
     );

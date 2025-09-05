@@ -3,7 +3,8 @@ import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
 import { Panel } from "./components/Panel";
 import { Preview } from "./components/Preview";
-import { ProgressBar } from "./components/ProgressBar";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { Timer } from "./components/Timer";
 import { useBuild } from "./hooks/useBuild";
 import { useFileContent } from "./hooks/useFileContent";
@@ -46,44 +47,30 @@ const Project = () => {
   const memoizedFileTree = useMemo(() => fileTree, [fileTree]);
 
   const buildButton = (
-    <button
-      type="button"
+    <Button
       onClick={handleBuild}
       disabled={isBuilding || !project}
-      style={{
-        padding: "0.25rem 0.75rem",
-        borderRadius: "0.375rem",
-        border: "none",
-        fontSize: "0.875rem",
-        background: isBuilding ? "#d1d5db" : "#2563eb",
-        color: "#fff",
-        fontWeight: 500,
-        cursor: isBuilding ? "not-allowed" : "pointer",
-        transition: "background 0.2s",
-      }}
+      variant="default"
+      size="sm"
+      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
     >
       {isBuilding ? "Building..." : "Build"}
-    </button>
+    </Button>
   );
 
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "row",
-        backgroundColor: "#f3f4f6",
-        fontFamily: "sans-serif",
-      }}
-    >
+    <div className="h-screen flex flex-row bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
+      {/* 科技感背景装饰 */}
+      <div className="absolute inset-0 bg-gradient-radial from-purple-500/10 via-transparent to-transparent pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent pointer-events-none z-0" />
       <Panel
         title="Project"
         actions={buildButton}
         style={{
           width: "25%",
           minWidth: "300px",
-          borderRight: "1px solid #e5e7eb",
         }}
         contentStyle={{ padding: "0.5rem 1rem" }}
       >
@@ -100,18 +87,16 @@ const Project = () => {
             }}>
               <span style={{ 
                 fontSize: "0.875rem", 
-                color: "#374151", 
+                color: "#e2e8f0", 
                 fontWeight: 500 
               }}>
                 {initMessage || "正在初始化项目..."}
               </span>
               <Timer isRunning={isLoading} format="seconds" />
             </div>
-            <ProgressBar 
-              progress={initProgress || 0} 
-              animated={isLoading}
-              color="#22c55e"
-              height={6}
+            <Progress 
+              value={initProgress || 0} 
+              className="h-1.5 bg-secondary/20"
             />
           </div>
         )}
@@ -125,18 +110,16 @@ const Project = () => {
             }}>
               <span style={{ 
                 fontSize: "0.875rem", 
-                color: "#374151", 
+                color: "#e2e8f0", 
                 fontWeight: 500 
               }}>
                 {buildMessage || "正在构建项目..."}
               </span>
               <Timer isRunning={isBuilding} format="seconds" />
             </div>
-            <ProgressBar 
-              progress={buildProgress || 0} 
-              animated={isBuilding}
-              color="#2563eb"
-              height={6}
+            <Progress 
+              value={buildProgress || 0} 
+              className="h-1.5 bg-secondary/20"
             />
           </div>
         )}
@@ -170,7 +153,6 @@ const Project = () => {
         style={{
           width: "40%",
           minWidth: "320px",
-          borderRight: "1px solid #e5e7eb",
         }}
         contentStyle={{ paddingTop: "0.5rem" }}
       >
@@ -183,7 +165,10 @@ const Project = () => {
 
       <Panel
         title="Preview"
-        style={{ width: "35%", minWidth: "320px" }}
+        style={{ 
+          width: "35%", 
+          minWidth: "320px",
+        }}
         contentStyle={{ padding: 0 }}
       >
         <Preview 
