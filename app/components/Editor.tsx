@@ -34,7 +34,7 @@ export const Editor = ({ filePath, content, onContentChange }: EditorProps) => {
             }
             value={content}
             onChange={(value) => onContentChange(value || "")}
-            theme="vs-dark"
+            theme="custom-dark"
             options={{
                 readOnly: false,
                 fontSize: 14,
@@ -48,6 +48,29 @@ export const Editor = ({ filePath, content, onContentChange }: EditorProps) => {
                 smoothScrolling: true,
                 wordWrap: "on",
                 automaticLayout: true,
+            }}
+            beforeMount={(monaco) => {
+                monaco.editor.defineTheme('custom-dark', {
+                    base: 'vs-dark',
+                    inherit: true,
+                    rules: [],
+                    colors: {
+                        'editor.background': '#0f172a',
+                        'editor.foreground': '#f8fafc',
+                        'editor.lineHighlightBackground': '#1e293b',
+                        'editor.selectionBackground': '#3b82f64d',
+                        'editor.inactiveSelectionBackground': '#1e293b',
+                        'editorCursor.foreground': '#3b82f6',
+                        'editorLineNumber.foreground': '#94a3b8',
+                        'editorLineNumber.activeForeground': '#f8fafc',
+                        'editorGutter.background': '#0f172a',
+                        'editorBracketMatch.background': '#1e293b',
+                        'editorBracketMatch.border': '#3b82f6',
+                    }
+                });
+            }}
+            onMount={(editor, monaco) => {
+                monaco.editor.setTheme('custom-dark');
             }}
         />
     );

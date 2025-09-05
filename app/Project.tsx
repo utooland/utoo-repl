@@ -54,17 +54,43 @@ const Project = () => {
       size="sm"
       className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
     >
-      {isBuilding ? "Building..." : "Build"}
+      {isBuilding ? "Building..." : "Build via @utoo/web"}
     </Button>
   );
 
 
   return (
-    <div className="h-screen flex flex-row bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
       {/* 科技感背景装饰 */}
       <div className="absolute inset-0 bg-gradient-radial from-purple-500/10 via-transparent to-transparent pointer-events-none z-0" />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent pointer-events-none z-0" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent pointer-events-none z-0" />
+      
+      {/* 顶部标题栏 */}
+      <div className="flex items-center justify-between px-6 py-4 bg-card/20 backdrop-blur-sm border-b border-border/30 z-10">
+        <div className="flex items-center gap-4">
+          <img 
+            src="https://avatars.githubusercontent.com/u/217533135?s=200&v=4" 
+            alt="Utoo Logo" 
+            className="w-8 h-8 rounded-lg shadow-lg"
+          />
+          <div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Utoo REPL
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              An unified toolchain for web development
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Powered by</span>
+          <span className="font-mono text-primary">@utoo/web</span>
+        </div>
+      </div>
+      
+      {/* 主要内容区域 */}
+      <div className="flex-1 flex flex-row relative z-10">
       <Panel
         title="Project"
         actions={buildButton}
@@ -182,6 +208,7 @@ const Project = () => {
           buildMessage={buildMessage}
         />
       </Panel>
+      </div>
     </div>
   );
 };
