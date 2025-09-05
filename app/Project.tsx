@@ -3,6 +3,8 @@ import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
 import { Panel } from "./components/Panel";
 import { Preview } from "./components/Preview";
+import { ProgressBar } from "./components/ProgressBar";
+import { Timer } from "./components/Timer";
 import { useBuild } from "./hooks/useBuild";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
@@ -10,13 +12,14 @@ import { useUtooProject } from "./hooks/useUtooProject";
 import "./styles.css";
 
 const Project = () => {
-  const { project, isLoading, error: projectError } = useUtooProject();
+  const { project, isLoading, error: projectError, initProgress, initMessage } = useUtooProject();
   const { fileTree, handleDirectoryExpand } = useFileTree(project);
   const {
     selectedFilePath,
     selectedFileContent,
     setSelectedFileContent,
     previewUrl,
+    updatePreviewUrl,
     fetchFileContent,
     error: fileContentError,
   } = useFileContent(project);
@@ -27,10 +30,15 @@ const Project = () => {
     isBuilding,
     handleBuild,
     error: buildError,
+    buildProgress,
+    buildMessage,
   } = useBuild(project, fileTree, handleDirectoryExpand, () => {
     if (previewRef.current) {
       previewRef.current.reload();
     }
+  }, (url: string) => {
+    // 构建完成后自动设置预览 URL
+    updatePreviewUrl(url);
   });
 
   const error = projectError || fileContentError || buildError;
@@ -39,6 +47,7 @@ const Project = () => {
 
   const buildButton = (
     <button
+      type="button"
       onClick={handleBuild}
       disabled={isBuilding || !project}
       style={{
@@ -56,6 +65,7 @@ const Project = () => {
       {isBuilding ? "Building..." : "Build"}
     </button>
   );
+
 
   return (
     <div
@@ -77,13 +87,58 @@ const Project = () => {
         }}
         contentStyle={{ padding: "0.5rem 1rem" }}
       >
-        {isLoading && (
-          <p style={{ textAlign: "center", color: "#22c55e", fontWeight: 500 }}>
-            Installing dependencies...
-          </p>
-        )}
         {error && (
           <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>
+        )}
+        {(isLoading || (initProgress !== undefined && initProgress > 0)) && (
+          <div style={{ marginBottom: "1rem" }}>
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center", 
+              marginBottom: "0.5rem" 
+            }}>
+              <span style={{ 
+                fontSize: "0.875rem", 
+                color: "#374151", 
+                fontWeight: 500 
+              }}>
+                {initMessage || "正在初始化项目..."}
+              </span>
+              <Timer isRunning={isLoading} format="seconds" />
+            </div>
+            <ProgressBar 
+              progress={initProgress || 0} 
+              animated={isLoading}
+              color="#22c55e"
+              height={6}
+            />
+          </div>
+        )}
+        {(isBuilding || (buildProgress !== undefined && buildProgress > 0)) && (
+          <div style={{ marginBottom: "1rem" }}>
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center", 
+              marginBottom: "0.5rem" 
+            }}>
+              <span style={{ 
+                fontSize: "0.875rem", 
+                color: "#374151", 
+                fontWeight: 500 
+              }}>
+                {buildMessage || "正在构建项目..."}
+              </span>
+              <Timer isRunning={isBuilding} format="seconds" />
+            </div>
+            <ProgressBar 
+              progress={buildProgress || 0} 
+              animated={isBuilding}
+              color="#2563eb"
+              height={6}
+            />
+          </div>
         )}
         {!isLoading && !error && (
           <ul
@@ -95,9 +150,9 @@ const Project = () => {
               alignItems: "flex-start",
             }}
           >
-            {memoizedFileTree.map((item, index) => (
+            {memoizedFileTree.map((item) => (
               <FileTreeItem
-                key={index}
+                key={item.fullName}
                 item={item}
                 onFileClick={fetchFileContent}
                 onDirectoryExpand={
@@ -129,9 +184,18 @@ const Project = () => {
       <Panel
         title="Preview"
         style={{ width: "35%", minWidth: "320px" }}
-        contentStyle={{ padding: "1rem" }}
+        contentStyle={{ padding: 0 }}
       >
-        <Preview ref={previewRef} url={previewUrl} />
+        <Preview 
+          ref={previewRef} 
+          url={previewUrl}
+          isLoading={isLoading}
+          isBuilding={isBuilding}
+          initProgress={initProgress}
+          initMessage={initMessage}
+          buildProgress={buildProgress}
+          buildMessage={buildMessage}
+        />
       </Panel>
     </div>
   );
