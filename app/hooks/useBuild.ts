@@ -20,15 +20,15 @@ export const useBuild = (
         setIsBuilding(true);
         setError("");
         setBuildProgress(0);
-        setBuildMessage("开始构建...");
+        setBuildMessage("Starting build...");
         
         try {
-            // 模拟构建进度
+            // Simulate build progress
             const progressSteps = [
-                { progress: 20, message: "解析项目配置..." },
-                { progress: 40, message: "编译 TypeScript..." },
-                { progress: 60, message: "打包资源文件..." },
-                { progress: 80, message: "生成构建产物..." },
+                { progress: 20, message: "Parsing project configuration..." },
+                { progress: 40, message: "Compiling TypeScript..." },
+                { progress: 60, message: "Bundling assets..." },
+                { progress: 80, message: "Generating build artifacts..." },
             ];
             
             let currentStep = 0;
@@ -44,7 +44,7 @@ export const useBuild = (
             await project.build();
             clearInterval(progressInterval);
             setBuildProgress(90);
-            setBuildMessage("处理构建结果...");
+            setBuildMessage("Processing build results...");
 
             try {
                 const statsContent = await project.readFile("dist/stats.json", "utf8");
@@ -68,9 +68,9 @@ export const useBuild = (
 
                 await project.writeFile("dist/index.html", html);
                 setBuildProgress(100);
-                setBuildMessage("构建完成！");
+                setBuildMessage("Build complete!");
                 
-                // 自动设置预览 URL
+                // Automatically set the preview URL
                 if (onPreviewReady) {
                     const previewUrl = `${location.origin}/preview/dist/index.html`;
                     onPreviewReady(previewUrl);
@@ -93,7 +93,7 @@ export const useBuild = (
             setError(`Build failed: ${errorMessage}`);
         } finally {
             setIsBuilding(false);
-            // 保留进度条显示，不重置
+            // Keep the progress bar displayed, do not reset
         }
     }, [project, fileTree, handleDirectoryExpand, onBuildComplete, onPreviewReady]);
 

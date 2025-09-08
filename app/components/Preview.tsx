@@ -32,7 +32,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
     }));
 
 
-    // 显示 loading 状态
+    // Display loading state
     if (isLoading) {
         return (
             <div className="h-full flex flex-col justify-center items-center text-foreground text-center p-8 bg-gradient-to-br from-slate-900/90 to-purple-900/90 relative">
@@ -40,7 +40,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                     ⚙️
                 </div>
                 <div style={{ fontSize: "0.875rem", fontWeight: 500, marginBottom: "1rem" }}>
-                    {initMessage || "正在初始化项目..."}
+                    {initMessage || "Initializing project..."}
                 </div>
                 <div style={{ width: "100%", maxWidth: "300px", marginBottom: "1rem" }}>
                     <div style={{ 
@@ -54,7 +54,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                             color: "#cbd5e1", 
                             fontWeight: 500 
                         }}>
-                            初始化进度
+                            Initialization Progress
                         </span>
                         <Timer isRunning={isLoading} format="seconds" />
                     </div>
@@ -64,13 +64,13 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                 />
                 </div>
                 <div style={{ fontSize: "0.75rem" }}>
-                    请稍候，项目初始化完成后即可预览
+                    Please wait, the preview will be available after project initialization.
                 </div>
             </div>
         );
     }
 
-    // 显示构建状态
+    // Display building state
     if (isBuilding) {
         return (
             <div className="h-full flex flex-col justify-center items-center text-muted-foreground text-center p-8 bg-gradient-to-br from-slate-900/90 to-purple-900/90">
@@ -78,7 +78,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                     🔨
                 </div>
                 <div style={{ fontSize: "0.875rem", fontWeight: 500, marginBottom: "1rem" }}>
-                    {buildMessage || "正在构建项目..."}
+                    {buildMessage || "Building project..."}
                 </div>
                 <div style={{ width: "100%", maxWidth: "300px", marginBottom: "1rem" }}>
                     <div style={{ 
@@ -92,7 +92,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                             color: "#cbd5e1", 
                             fontWeight: 500 
                         }}>
-                            构建进度
+                            Build Progress
                         </span>
                         <Timer isRunning={isBuilding} format="seconds" />
                     </div>
@@ -102,16 +102,16 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                 />
                 </div>
                 <div style={{ fontSize: "0.75rem" }}>
-                    构建完成后将自动显示预览内容
+                    The preview will be displayed automatically after the build is complete.
                 </div>
             </div>
         );
     }
 
-    // 显示预览内容
+    // Display preview content
     return (
         <div className="h-full w-full flex flex-col">
-            {/* 预览内容 */}
+            {/* Preview content */}
             {url ? (
                 <iframe
                     ref={iframeRef}
@@ -125,10 +125,10 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                         📄
                     </div>
                     <div style={{ fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.25rem" }}>
-                        暂无预览内容
+                        No preview available
                     </div>
                     <div style={{ fontSize: "0.75rem" }}>
-                        点击 Build 按钮构建项目后即可预览
+                        Click the Build button to build the project and see the preview.
                     </div>
                 </div>
             )}

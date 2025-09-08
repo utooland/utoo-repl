@@ -38,7 +38,7 @@ const Project = () => {
       previewRef.current.reload();
     }
   }, (url: string) => {
-    // 构建完成后自动设置预览 URL
+    // Automatically set the preview URL after build is complete
     updatePreviewUrl(url);
   });
 
@@ -61,12 +61,12 @@ const Project = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
-      {/* 科技感背景装饰 */}
+      {/* Tech-style background decoration */}
       <div className="absolute inset-0 bg-gradient-radial from-purple-500/10 via-transparent to-transparent pointer-events-none z-0" />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent pointer-events-none z-0" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent pointer-events-none z-0" />
       
-      {/* 顶部标题栏 */}
+      {/* Top title bar */}
       <div className="flex items-center justify-between px-6 py-4 bg-card/20 backdrop-blur-sm border-b border-border/30 z-10">
         <div className="flex items-center gap-4">
           <img 
@@ -96,7 +96,7 @@ const Project = () => {
         </div>
       </div>
       
-      {/* 主要内容区域 */}
+      {/* Main content area */}
       <div className="flex-1 flex flex-row relative z-10">
       <Panel
         title="Project"
@@ -123,7 +123,7 @@ const Project = () => {
                 color: "#e2e8f0", 
                 fontWeight: 500 
               }}>
-                {initMessage || "正在初始化项目..."}
+                {initMessage || "Initializing project..."}
               </span>
               <Timer isRunning={isLoading} format="seconds" />
             </div>
@@ -146,7 +146,7 @@ const Project = () => {
                 color: "#e2e8f0", 
                 fontWeight: 500 
               }}>
-                {buildMessage || "正在构建项目..."}
+                {buildMessage || "Building project..."}
               </span>
               <Timer isRunning={isBuilding} format="seconds" />
             </div>

@@ -33,7 +33,7 @@ export const useFileContent = (project: UtooProject | null) => {
 
     useEffect(() => {
         if (selectedFilePath) {
-            // 清理文件路径，移除 ./ 前缀
+            // Clean up the file path, remove the ./ prefix
             const cleanPath = selectedFilePath.replace(/^\.\//, '');
             document.title = `Utoo REPL - ${cleanPath}`;
         } else {

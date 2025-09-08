@@ -20,16 +20,16 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
         },
     });
 
-    onProgress?.(10, "初始化服务工作者...");
+    onProgress?.(10, "Initializing service worker...");
     await projectInstance.installServiceWorker();
     
-    onProgress?.(20, "安装依赖包...");
+    onProgress?.(20, "Installing dependencies...");
     await installDependencies(projectInstance, onProgress);
     
-    onProgress?.(80, "创建项目文件...");
+    onProgress?.(80, "Creating project files...");
     await initUtooProject(projectInstance);
     
-    onProgress?.(100, "项目初始化完成！");
+    onProgress?.(100, "Project initialization complete!");
 
     return projectInstance;
 };
@@ -42,11 +42,11 @@ const installDependencies = async (project: UtooProject, onProgress?: ProgressCa
     );
     const start = performance.now();
     
-    // 模拟安装进度
+    // Simulate installation progress
     const progressSteps = [
-        { progress: 25, message: "解析依赖包..." },
-        { progress: 50, message: "下载依赖包..." },
-        { progress: 75, message: "安装依赖包..." },
+        { progress: 25, message: "Resolving dependencies..." },
+        { progress: 50, message: "Downloading dependencies..." },
+        { progress: 75, message: "Installing dependencies..." },
     ];
     
     let currentStep = 0;
@@ -61,7 +61,7 @@ const installDependencies = async (project: UtooProject, onProgress?: ProgressCa
     try {
         await project.install(JSON.stringify(packageLock));
         clearInterval(progressInterval);
-        onProgress?.(100, "依赖安装完成！");
+        onProgress?.(100, "Dependencies installed successfully!");
     } catch (error) {
         clearInterval(progressInterval);
         throw error;
