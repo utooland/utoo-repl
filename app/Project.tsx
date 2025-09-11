@@ -189,7 +189,7 @@ const Project = () => {
         </Panel>
       </div>
       {/* Footer area */}
-      <div className='flex items-center justify-between px-6 py-1 bg-card/20 backdrop-blur-sm border-t border-border/30 z-10'>
+      <div className='flex items-center justify-between px-6 py-2 bg-card/20 backdrop-blur-sm border-t border-border/30 z-10'>
         <div className='flex items-center gap-2'>
           <img
             src='https://avatars.githubusercontent.com/u/217533135?s=200&v=4'
