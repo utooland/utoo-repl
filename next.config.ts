@@ -23,7 +23,6 @@ const nextConfig: NextConfig = {
     ]
   },
   webpack: (config, { isServer, dev }) => {
-
     if (!isServer && !dev) {
       config.optimization.splitChunks = false;
       config.output.chunkFilename = (pathData) => {
