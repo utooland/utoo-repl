@@ -8,8 +8,10 @@ interface PreviewProps {
     isBuilding?: boolean;
     initProgress?: number;
     initMessage?: string;
+    initTime?: number;
     buildProgress?: number;
     buildMessage?: string;
+    buildTime?: number;
 }
 
 export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({ 
@@ -18,8 +20,10 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
     isBuilding,
     initProgress,
     initMessage,
+    initTime,
     buildProgress,
-    buildMessage
+    buildMessage,
+    buildTime
 }, ref) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -56,7 +60,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                         }}>
                             Initialization Progress
                         </span>
-                        <Timer isRunning={isLoading} format="seconds" />
+                        <Timer time={initTime || 0} format="seconds" />
                     </div>
                                     <Progress 
                     value={initProgress || 0} 
@@ -94,7 +98,7 @@ export const Preview = forwardRef<{ reload: () => void }, PreviewProps>(({
                         }}>
                             Build Progress
                         </span>
-                        <Timer isRunning={isBuilding} format="seconds" />
+                        <Timer time={buildTime || 0} format="seconds" />
                     </div>
                                     <Progress 
                     value={buildProgress || 0} 

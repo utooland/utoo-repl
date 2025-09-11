@@ -181,8 +181,10 @@ const Project = () => {
             isBuilding={isBuilding}
             initProgress={initProgress}
             initMessage={initMessage}
+            initTime={initTime}
             buildProgress={buildProgress}
             buildMessage={buildMessage}
+            buildTime={buildTime}
           />
         </Panel>
       </div>
