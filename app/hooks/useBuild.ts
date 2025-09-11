@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import type { Project as UtooProject } from "@utoo/web";
 import type { FileTreeNode } from "../types";
 import { generateHtml } from "../utils/htmlGenerator";
+import { useTimer } from "./useTimer";
 
 export const useBuild = (
     project: UtooProject | null,
@@ -14,6 +15,7 @@ export const useBuild = (
     const [error, setError] = useState("");
     const [buildProgress, setBuildProgress] = useState(0);
     const [buildMessage, setBuildMessage] = useState("");
+    const { time: buildTime, start: startBuildTimer, stop: stopBuildTimer, reset: resetBuildTimer } = useTimer();
 
     const handleBuild = useCallback(async () => {
         if (!project) return;
@@ -21,6 +23,8 @@ export const useBuild = (
         setError("");
         setBuildProgress(0);
         setBuildMessage("Starting build...");
+        resetBuildTimer();
+        startBuildTimer();
         
         try {
             // Simulate build progress
@@ -92,10 +96,11 @@ export const useBuild = (
             const errorMessage = e instanceof Error ? e.message : String(e);
             setError(`Build failed: ${errorMessage}`);
         } finally {
+            stopBuildTimer();
             setIsBuilding(false);
             // Keep the progress bar displayed, do not reset
         }
-    }, [project, fileTree, handleDirectoryExpand, onBuildComplete, onPreviewReady]);
+    }, [project, fileTree, handleDirectoryExpand, onBuildComplete, onPreviewReady, startBuildTimer, stopBuildTimer, resetBuildTimer]);
 
-    return { isBuilding, handleBuild, error, buildProgress, buildMessage };
+    return { isBuilding, handleBuild, error, buildProgress, buildMessage, buildTime };
 };

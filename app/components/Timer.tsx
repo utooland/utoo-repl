@@ -1,53 +1,24 @@
 import type React from 'react';
-import { useState, useEffect, useRef } from 'react';
 
 interface TimerProps {
-  isRunning: boolean;
-  onTimeUpdate?: (time: number) => void;
+  time: number;
   format?: 'seconds' | 'milliseconds';
   style?: React.CSSProperties;
 }
 
 export const Timer: React.FC<TimerProps> = ({
-  isRunning,
-  onTimeUpdate,
+  time,
   format = 'seconds',
   style = {},
 }) => {
-  const [time, setTime] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<number>(0);
-
-  useEffect(() => {
-    if (isRunning) {
-      startTimeRef.current = Date.now() - time * (format === 'seconds' ? 1000 : 1);
-      intervalRef.current = setInterval(() => {
-        const elapsed = Date.now() - startTimeRef.current;
-        const newTime = format === 'seconds' ? elapsed / 1000 : elapsed;
-        setTime(newTime);
-        onTimeUpdate?.(newTime);
-      }, format === 'seconds' ? 100 : 10);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isRunning, format, onTimeUpdate, time]);
-
   const formatTime = (time: number): string => {
     if (format === 'seconds') {
-      if (time < 60) {
-        return `${time.toFixed(1)}s`;
+      const timeInSeconds = time / 1000;
+      if (timeInSeconds < 60) {
+        return `${timeInSeconds.toFixed(3)}s`;
       } else {
-        const minutes = Math.floor(time / 60);
-        const seconds = (time % 60).toFixed(1);
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = (timeInSeconds % 60).toFixed(3);
         return `${minutes}m ${seconds}s`;
       }
     } else {

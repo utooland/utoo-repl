@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import type { Project as UtooProject } from "@utoo/web";
 import { initializeProject, type ProgressCallback } from "../services/utooService";
+import { useTimer } from "./useTimer";
 
 export const useUtooProject = () => {
     const [project, setProject] = useState<UtooProject | null>(null);
@@ -8,6 +9,7 @@ export const useUtooProject = () => {
     const [error, setError] = useState("");
     const [initProgress, setInitProgress] = useState(0);
     const [initMessage, setInitMessage] = useState("");
+    const { time: initTime, start: startInitTimer, stop: stopInitTimer } = useTimer();
     const initStarted = useRef(false);
 
     useEffect(() => {
@@ -17,7 +19,8 @@ export const useUtooProject = () => {
         const init = async () => {
             setIsLoading(true);
             setInitProgress(0);
-            setInitMessage("开始初始化项目...");
+            setInitMessage("Starting project initialization...");
+            startInitTimer();
             
             const onProgress: ProgressCallback = (progress, message) => {
                 setInitProgress(progress);
@@ -32,12 +35,13 @@ export const useUtooProject = () => {
                 setError(`Initialization failed: ${errorMessage}`);
             } finally {
                 setIsLoading(false);
-                // 保留进度条显示，不重置
+                stopInitTimer();
+                // Keep the progress bar displayed, do not reset
             }
         };
 
         init();
-    }, []);
+    }, [startInitTimer, stopInitTimer]);
 
-    return { project, isLoading, error, initProgress, initMessage };
+    return { project, isLoading, error, initProgress, initMessage, initTime };
 };
