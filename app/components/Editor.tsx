@@ -50,27 +50,45 @@ export const Editor = ({ filePath, content, onContentChange }: EditorProps) => {
                 automaticLayout: true,
             }}
             beforeMount={(monaco) => {
-                monaco.editor.defineTheme('custom-dark', {
+                // Using Catppuccin Mocha theme
+                monaco.editor.defineTheme('catppuccin-mocha', {
                     base: 'vs-dark',
                     inherit: true,
-                    rules: [],
+                    rules: [
+                        { token: "comment", foreground: "a6adc8", fontStyle: "italic" },
+                        { token: "string", foreground: "a6e3a1" },
+                        { token: "number", foreground: "f9e2af" },
+                        { token: "keyword", foreground: "cba6f7" },
+                        { token: "operator", foreground: "94e2d5" },
+                        { token: "delimiter", foreground: "cdd6f4" },
+                        { token: "tag", foreground: "f38ba8" },
+                        { token: "attribute.name", foreground: "94e2d5" },
+                        { token: "attribute.value", foreground: "a6e3a1" },
+                        { token: "type", foreground: "fab387" },
+                        { token: "identifier", foreground: "cdd6f4" },
+                        { token: "predefined", foreground: "89b4fa" },
+                        { token: "variable", foreground: "cdd6f4" },
+                        { token: "function", foreground: "89b4fa" },
+                        { token: "constant", foreground: "fab387" },
+                        { token: "property", foreground: "89dceb" },
+                        { token: "namespace", foreground: "f5c2e7" },
+                    ],
                     colors: {
-                        'editor.background': '#0f172a',
-                        'editor.foreground': '#f8fafc',
-                        'editor.lineHighlightBackground': '#1e293b',
-                        'editor.selectionBackground': '#3b82f64d',
-                        'editor.inactiveSelectionBackground': '#1e293b',
-                        'editorCursor.foreground': '#3b82f6',
-                        'editorLineNumber.foreground': '#94a3b8',
-                        'editorLineNumber.activeForeground': '#f8fafc',
-                        'editorGutter.background': '#0f172a',
-                        'editorBracketMatch.background': '#1e293b',
-                        'editorBracketMatch.border': '#3b82f6',
-                    }
+                        "editor.background": "#1e1e2e",
+                        "editor.foreground": "#cdd6f4",
+                        "editor.lineHighlightBackground": "#ffffff0a",
+                        "editor.selectionBackground": "#585b70",
+                        "editorCursor.foreground": "#f5e0dc",
+                        "editorLineNumber.foreground": "#7f849c",
+                        "editorLineNumber.activeForeground": "#cdd6f4",
+                        "editorGutter.background": "#1e1e2e",
+                        "editorBracketMatch.background": "#1e1e2e",
+                        "editorBracketMatch.border": "#94e2d5",
+                    },
                 });
             }}
             onMount={(editor, monaco) => {
-                monaco.editor.setTheme('custom-dark');
+                monaco.editor.setTheme('catppuccin-mocha');
             }}
         />
     );
