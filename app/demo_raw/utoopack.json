@@ -5,5 +5,8 @@
       "name": "index"
     }
   ],
+  "output": {
+    "publicPath": "/dist"
+  },
   "stats": true
 }
