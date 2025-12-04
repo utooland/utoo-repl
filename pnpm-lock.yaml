@@ -18,8 +18,8 @@ importers:
         specifier: ^1.2.3
         version: 1.2.3(@types/react@19.1.12)(react@19.1.0)
       '@utoo/web':
-        specifier: 0.0.1-alpha.30
-        version: 0.0.1-alpha.30
+        specifier: 1.0.0
+        version: 1.0.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -38,6 +38,9 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
@@ -392,12 +395,12 @@ packages:
   '@types/react@19.1.12':
     resolution: {integrity: sha512-cMoR+FoAf/Jyq6+Df2/Z41jISvGZZ2eTlnsaJRptmZ76Caldwy1odD4xTr/gNV9VLj0AWgg/nmkevIyUfIIq5w==}
 
-  '@utoo/pack-shared@0.0.5':
-    resolution: {integrity: sha512-0Skz8lg6Ag2vxcAswSWXlep7gVlDQFjweLBKsqDSbzoaXXdTt9IhzCp8xIelbtIKaAAlFzsrK44gf6xLw1tYmg==}
+  '@utoo/pack-shared@0.0.7':
+    resolution: {integrity: sha512-CATHVePPWDirHvej0dR2x6nYPHjXgggpiMPOC846z1a9En20r3G1xrMkDBcNDbKlWJ2uF+kyR3qzcrLCCH+YCw==}
     engines: {node: '>= 20'}
 
-  '@utoo/web@0.0.1-alpha.30':
-    resolution: {integrity: sha512-w4at4cKY4VdK6BJUDEc4Jnam/tfEvUh0mKIGEVE1mm/QPM2wSP7oxY/JoN8xws2R1rE4mdP7cXvNXYJA6/DuSg==}
+  '@utoo/web@1.0.0':
+    resolution: {integrity: sha512-4/Z2HfTbhIwGu+kDUPD7CUmsEo1rnG/WV6KZS+WB8yXaavbDRRiHhtQCRlOoIJkoRr6eq2MAZ6OXsEy5s9Zthw==}
     engines: {node: '>= 20'}
 
   '@webassemblyjs/ast@1.14.1':
@@ -1088,6 +1091,12 @@ packages:
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
 
+  sonner@2.0.7:
+    resolution: {integrity: sha512-W6ZN4p58k8aDKA4XPcx2hpIQXBRAgyiWVkYhT7CvK6D3iAu7xjvVyhQHg2/iaKJZ1XVJ4r7XuwGL+WGEK37i9w==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -1519,14 +1528,14 @@ snapshots:
     dependencies:
       csstype: 3.1.3
 
-  '@utoo/pack-shared@0.0.5':
+  '@utoo/pack-shared@0.0.7':
     dependencies:
       '@babel/code-frame': 7.22.5
       picocolors: 1.1.1
 
-  '@utoo/web@0.0.1-alpha.30':
+  '@utoo/web@1.0.0':
     dependencies:
-      '@utoo/pack-shared': 0.0.5
+      '@utoo/pack-shared': 0.0.7
       comlink: 4.4.2
 
   '@webassemblyjs/ast@1.14.1':
@@ -2194,6 +2203,11 @@ snapshots:
     dependencies:
       is-arrayish: 0.3.2
     optional: true
+
+  sonner@2.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   source-map-js@1.2.1: {}
 

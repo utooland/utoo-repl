@@ -1,37 +1,58 @@
 import { useState, useCallback, useEffect } from "react";
-import { Project as UtooProject } from "@utoo/web";
-import { FileTreeNode, DirectoryExpandParams, ProjectFileItem } from "../types";
+import type { Project as UtooProject } from "@utoo/web";
+import type { FileTreeNode, DirectoryExpandParams, ProjectFileItem } from "../types";
 
 const projectName = "/utooweb-demo";
+
+const sortFileTreeNodes = (nodes: FileTreeNode[]): FileTreeNode[] =>
+    nodes.sort((a, b) =>
+        a.type === b.type
+            ? a.name.localeCompare(b.name)
+            : a.type.localeCompare(b.type),
+    );
+
+const joinPath = (parent: string, child: string): string =>
+    parent === "." ? child : `${parent}/${child}`;
+
+const itemToFileTreeNode = (item: ProjectFileItem, fullName: string): FileTreeNode => ({
+    name: item.name,
+    fullName,
+    type: item.isDirectory() ? ("directory" as const) : ("file" as const),
+    children: item.isDirectory() ? [] : null,
+});
+
+const loadDirectoryChildren = async (project: UtooProject, parentPath: string): Promise<FileTreeNode[]> => {
+    const children = await project.readdir(parentPath);
+    return sortFileTreeNodes(
+        children.map((item) => itemToFileTreeNode(item, joinPath(parentPath, item.name)))
+    );
+};
+
+const removeNodeFromTree = (tree: FileTreeNode[], targetPath: string): FileTreeNode[] => {
+    return tree
+        .map((node) => ({
+            ...node,
+            children: node.children
+                ? removeNodeFromTree(node.children, targetPath)
+                : node.children,
+        }))
+        .filter((node) => node.fullName !== targetPath);
+};
 
 export const useFileTree = (project: UtooProject | null) => {
     const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
     const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set(["."]));
 
     const buildInitialFileTree = useCallback(async (proj: UtooProject) => {
-        const rootItems = await proj.readdir(".");
-        const initialTree = [
+        const children = await loadDirectoryChildren(proj, ".");
+        setFileTree([
             {
                 name: projectName,
                 fullName: ".",
                 type: "directory" as const,
-                children: rootItems
-                    .map((item) => ({
-                        ...item,
-                        fullName: `./${item.name}`,
-                        type: item.isDirectory()
-                            ? ("directory" as const)
-                            : ("file" as const),
-                        children: item.isDirectory() ? [] : null,
-                    }))
-                    .sort((a, b) =>
-                        a.type === b.type
-                            ? a.name.localeCompare(b.name)
-                            : a.type.localeCompare(b.type),
-                    ),
+                children,
             },
-        ];
-        setFileTree(initialTree);
+        ]);
     }, []);
 
     useEffect(() => {
@@ -72,32 +93,67 @@ export const useFileTree = (project: UtooProject | null) => {
 
                 setExpandedDirs(prev => new Set(prev).add(parentItem.fullName));
 
-                const children: ProjectFileItem[] = await project.readdir(parentItem.fullName);
-
-                const newChildren: FileTreeNode[] = children
-                    .map((item: ProjectFileItem) => ({
-                        ...item,
-                        fullName: [parentItem.fullName, item.name].filter(Boolean).join("/"),
-                        name: item.name,
-                        type: item.isDirectory() ? ("directory" as const) : ("file" as const),
-                        children: item.isDirectory() ? [] : null,
-                    }))
-                    .sort((a, b) =>
-                        a.type === b.type
-                            ? a.name.localeCompare(b.name)
-                            : a.type.localeCompare(b.type),
-                    );
-
-                setFileTree((prevTree) => {
-                    const updatedTree = updateTreeWithChildren(prevTree, parentItem.fullName, newChildren);
-                    return [...updatedTree];
-                });
-            } catch (e: any) {
+                const newChildren = await loadDirectoryChildren(project, parentItem.fullName);
+                setFileTree((prevTree) => updateTreeWithChildren(prevTree, parentItem.fullName, newChildren));
+            } catch (e: unknown) {
                 console.error(`Error expanding directory at path ${parentItem.fullName}:`, e);
             }
         },
         [project, updateTreeWithChildren],
     );
 
-    return { fileTree, handleDirectoryExpand, setFileTree };
+    const createItem = useCallback(
+        async (parentPath: string, itemName: string, isFolder: boolean): Promise<void> => {
+            try {
+                if (!project) throw new Error("Project not initialized.");
+
+                const itemPath = joinPath(parentPath, itemName);
+                isFolder ? await project.mkdir(itemPath) : await project.writeFile(itemPath, "");
+
+                const newChildren = await loadDirectoryChildren(project, parentPath);
+                setFileTree((prevTree) => updateTreeWithChildren(prevTree, parentPath, newChildren));
+            } catch (e: unknown) {
+                console.error(`Error creating ${isFolder ? "folder" : "file"} at path ${parentPath}/${itemName}:`, e);
+                throw e;
+            }
+        },
+        [project, updateTreeWithChildren],
+    );
+
+    const createFile = useCallback(
+        (parentPath: string, fileName: string) => createItem(parentPath, fileName, false),
+        [createItem],
+    );
+
+    const createFolder = useCallback(
+        (parentPath: string, folderName: string) => createItem(parentPath, folderName, true),
+        [createItem],
+    );
+
+    const deleteItem = useCallback(
+        async (itemPath: string): Promise<void> => {
+            try {
+                if (!project) throw new Error("Project not initialized.");
+
+                // TODO: rm has a bug, will support files after fix
+                await project.rmdir(itemPath, { recursive: true });
+
+                const parentPath = itemPath.split("/").slice(0, -1).join("/") || ".";
+                const newChildren = await loadDirectoryChildren(project, parentPath);
+                setFileTree((prevTree) => updateTreeWithChildren(prevTree, parentPath, newChildren));
+
+                setExpandedDirs(prev => {
+                    const updated = new Set(prev);
+                    updated.delete(itemPath);
+                    return updated;
+                });
+            } catch (e: unknown) {
+                console.error(`Error deleting folder at path ${itemPath}:`, e);
+                throw e;
+            }
+        },
+        [project, updateTreeWithChildren],
+    );
+
+    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder, deleteItem };
 };
