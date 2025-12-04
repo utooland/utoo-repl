@@ -12,6 +12,10 @@ export interface FileTreeItemProps {
   onFileClick: (filePath: string) => Promise<void>;
   onDirectoryExpand?: (parentItem: FileTreeNode) => Promise<void>;
   selectedFile: string | null;
+  onContextMenu?: (e: React.MouseEvent, item: FileTreeNode) => void;
+  creatingItem?: CreateItemState | null;
+  onCreateConfirm?: (name: string) => void;
+  onCreateCancel?: () => void;
 }
 
 export interface DirectoryExpandParams {
@@ -24,4 +28,10 @@ export interface DirectoryExpandParams {
 export interface ProjectFileItem {
   name: string;
   isDirectory: () => boolean;
+}
+
+export interface CreateItemState {
+  type: "file" | "folder";
+  parentPath: string;
+  parentType: "directory" | "file";
 }

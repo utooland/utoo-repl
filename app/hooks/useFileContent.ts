@@ -10,6 +10,10 @@ export const useFileContent = (project: UtooProject | null) => {
 
     const fetchFileContent = useCallback(
         async (filePath: string): Promise<void> => {
+            if (selectedFilePath === filePath) {
+                return;
+            }
+
             setSelectedFilePath(filePath);
             setSelectedFileContent("");
             try {
@@ -26,7 +30,7 @@ export const useFileContent = (project: UtooProject | null) => {
                 setError(`Error reading file: ${errorMessage}`);
             }
         },
-        [project],
+        [project, selectedFilePath],
     );
 
     const debouncedWriteRef = useRef<NodeJS.Timeout | null>(null);
