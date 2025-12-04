@@ -28,6 +28,17 @@ const loadDirectoryChildren = async (project: UtooProject, parentPath: string): 
     );
 };
 
+const removeNodeFromTree = (tree: FileTreeNode[], targetPath: string): FileTreeNode[] => {
+    return tree
+        .map((node) => ({
+            ...node,
+            children: node.children
+                ? removeNodeFromTree(node.children, targetPath)
+                : node.children,
+        }))
+        .filter((node) => node.fullName !== targetPath);
+};
+
 export const useFileTree = (project: UtooProject | null) => {
     const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
     const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set(["."]));
@@ -119,5 +130,30 @@ export const useFileTree = (project: UtooProject | null) => {
         [createItem],
     );
 
-    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder };
+    const deleteItem = useCallback(
+        async (itemPath: string): Promise<void> => {
+            try {
+                if (!project) throw new Error("Project not initialized.");
+
+                // TODO: rm has a bug, will support files after fix
+                await project.rmdir(itemPath, { recursive: true });
+
+                const parentPath = itemPath.split("/").slice(0, -1).join("/") || ".";
+                const newChildren = await loadDirectoryChildren(project, parentPath);
+                setFileTree((prevTree) => updateTreeWithChildren(prevTree, parentPath, newChildren));
+
+                setExpandedDirs(prev => {
+                    const updated = new Set(prev);
+                    updated.delete(itemPath);
+                    return updated;
+                });
+            } catch (e: unknown) {
+                console.error(`Error deleting folder at path ${itemPath}:`, e);
+                throw e;
+            }
+        },
+        [project, updateTreeWithChildren],
+    );
+
+    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder, deleteItem };
 };

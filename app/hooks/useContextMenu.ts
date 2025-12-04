@@ -17,6 +17,7 @@ export const useContextMenu = (onDirectoryExpand?: (item: FileTreeNode) => void)
   });
 
   const [creatingItem, setCreatingItem] = useState<CreateItemState | null>(null);
+  const [deletingItem, setDeletingItem] = useState<FileTreeNode | null>(null);
 
   const handleContextMenu = useCallback((e: React.MouseEvent, item: FileTreeNode) => {
     e.preventDefault();
@@ -45,8 +46,18 @@ export const useContextMenu = (onDirectoryExpand?: (item: FileTreeNode) => void)
     });
   }, [contextMenu.item, onDirectoryExpand]);
 
+  const handleDelete = useCallback(() => {
+    const item = contextMenu.item;
+    if (!item) return;
+    setDeletingItem(item);
+  }, [contextMenu.item]);
+
   const cancelCreating = useCallback(() => {
     setCreatingItem(null);
+  }, []);
+
+  const cancelDeleting = useCallback(() => {
+    setDeletingItem(null);
   }, []);
 
   return { 
@@ -58,5 +69,9 @@ export const useContextMenu = (onDirectoryExpand?: (item: FileTreeNode) => void)
     creatingItem,
     setCreatingItem,
     cancelCreating,
+    deletingItem,
+    setDeletingItem,
+    handleDelete,
+    cancelDeleting,
   };
 };

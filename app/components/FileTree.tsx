@@ -121,7 +121,7 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          onContextMenu(e, item);
+          onContextMenu?.(e, item);
         }}
         style={{ paddingLeft: `${depth * 1}rem` }}
       >

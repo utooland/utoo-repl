@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
@@ -24,7 +24,7 @@ const Project = () => {
     initMessage,
     initTime,
   } = useUtooProject();
-  const { fileTree, handleDirectoryExpand, createFile, createFolder } = useFileTree(project);
+  const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem } = useFileTree(project);
   const {
     selectedFilePath,
     selectedFileContent,
@@ -69,8 +69,11 @@ const Project = () => {
     closeContextMenu, 
     handleCreateFile, 
     handleCreateFolder,
+    handleDelete,
     creatingItem,
     cancelCreating,
+    deletingItem,
+    cancelDeleting,
   } = useContextMenu(handleDirectoryExpand);
 
   const handleCreateConfirm = async (name: string) => {
@@ -86,6 +89,25 @@ const Project = () => {
       toast.error(`创建失败: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingItem) return;
+
+    try {
+      await deleteItem(deletingItem.fullName);
+      toast.success(`文件夹 "${deletingItem.name}" 已删除`);
+      cancelDeleting();
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      toast.error(`删除失败: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
+  useEffect(() => {
+    if (deletingItem) {
+      handleDeleteConfirm();
+    }
+  }, [deletingItem]);
 
   const buildButton = (
     <Button
@@ -178,6 +200,8 @@ const Project = () => {
             onClose={closeContextMenu}
             onNewFile={handleCreateFile}
             onNewFolder={handleCreateFolder}
+            onDelete={handleDelete}
+            selectedItem={contextMenu.item ? { type: contextMenu.item.type } : null}
           />
         )}
 
