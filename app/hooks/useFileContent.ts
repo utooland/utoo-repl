@@ -1,85 +1,146 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import type { Project as UtooProject } from "@utoo/web";
 import { serviceWorkerScope } from "../services/utooService";
 
-export const useFileContent = (project: UtooProject | null) => {
-    const [selectedFilePath, setSelectedFilePath] = useState("src/index.tsx");
-    const [selectedFileContent, setSelectedFileContent] = useState("");
-    const [previewUrl, setPreviewUrl] = useState<string>("");
-    const [error, setError] = useState("");
+interface FileState {
+  content: string;
+  isDirty: boolean;
+  isSaving?: boolean;
+}
 
-    const fetchFileContent = useCallback(
-        async (filePath: string): Promise<void> => {
-            if (selectedFilePath === filePath) {
-                return;
-            }
+export const useFileContent = (
+  project: UtooProject | null,
+  onShowConfirm?: (title: string) => Promise<'save' | 'dontSave' | null>
+) => {
+  const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx"]);
+  const [fileStates, setFileStates] = useState<Record<string, FileState>>({});
+  const [selectedFilePath, setSelectedFilePath] = useState<string>("src/index.tsx");
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
-            setSelectedFilePath(filePath);
-            setSelectedFileContent("");
-            try {
-                if (!project) throw new Error("Project not initialized.");
+  const updateFileState = useCallback((filePath: string, updates: Partial<FileState>) => {
+    setFileStates((prev) => ({
+      ...prev,
+      [filePath]: { ...prev[filePath], ...updates },
+    }));
+  }, []);
 
-                const content: string = await project.readFile(filePath, "utf8");
-                setSelectedFileContent(content);
-
-                if (filePath.endsWith("dist/index.html")) {
-                    setPreviewUrl(`${location.origin}${serviceWorkerScope}/${filePath}`);
-                }
-            } catch (e: unknown) {
-                const errorMessage = e instanceof Error ? e.message : String(e);
-                setError(`Error reading file: ${errorMessage}`);
-            }
-        },
-        [project, selectedFilePath],
-    );
-
-    const debouncedWriteRef = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        if (selectedFilePath) {
-            // Clean up the file path, remove the ./ prefix
-            const cleanPath = selectedFilePath.replace(/^\.\//, '');
-            document.title = `Utoo REPL - ${cleanPath}`;
-        } else {
-            document.title = 'Utoo REPL';
+  const readAndOpenFile = useCallback(
+    async (filePath: string) => {
+      try {
+        if (!project) throw new Error("Project not initialized.");
+        const content = await project.readFile(filePath, "utf8");
+        updateFileState(filePath, { content, isDirty: false, isSaving: false });
+        setSelectedFilePath(filePath);
+        setOpenFiles((prev) => (prev.includes(filePath) ? prev : [...prev, filePath]));
+        if (filePath.endsWith("dist/index.html")) {
+          setPreviewUrl(`${location.origin}${serviceWorkerScope}/${filePath}`);
         }
-    }, [selectedFilePath]);
+      } catch (e: unknown) {
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        setError(`Error reading file: ${errorMessage}`);
+      }
+    },
+    [project, updateFileState]
+  );
 
-    useEffect(() => {
-        if (debouncedWriteRef.current) {
-            clearTimeout(debouncedWriteRef.current);
+  const openFile = useCallback(
+    async (filePath: string) => {
+      if (!fileStates[filePath]) {
+        await readAndOpenFile(filePath);
+      } else {
+        setSelectedFilePath(filePath);
+        setOpenFiles((prev) => (prev.includes(filePath) ? prev : [...prev, filePath]));
+      }
+    },
+    [fileStates, readAndOpenFile]
+  );
+
+  const closeFile = useCallback(
+    async (filePath: string) => {
+      if (fileStates[filePath]?.isDirty) {
+        const fileName = filePath.split("/").pop();
+        const title = `Do you want to save the changes you made to ${fileName}?`;
+        const action = await onShowConfirm?.(title);
+        
+        if (action === null) {
+          return;
+        } else if (action === 'save') {
+          try {
+            updateFileState(filePath, { isSaving: true });
+            await project?.writeFile(filePath, fileStates[filePath].content);
+            updateFileState(filePath, { isDirty: false, isSaving: false });
+          } catch (e: unknown) {
+            setError(`Error saving file: ${e instanceof Error ? e.message : String(e)}`);
+            updateFileState(filePath, { isSaving: false });
+            return;
+          }
         }
+      }
 
-        if (project && selectedFilePath && selectedFileContent) {
-            debouncedWriteRef.current = setTimeout(async () => {
-                try {
-                    await project.writeFile(selectedFilePath, selectedFileContent);
-                    console.log(`File ${selectedFilePath} auto-saved successfully.`);
-                } catch (e: unknown) {
-                    const errorMessage = e instanceof Error ? e.message : String(e);
-                    setError(`Error auto-saving file: ${errorMessage}`);
-                }
-            }, 300);
+      const remainingFiles = openFiles.filter((p) => p !== filePath);
+      if (selectedFilePath === filePath) {
+        setSelectedFilePath(remainingFiles.length > 0 ? remainingFiles[remainingFiles.length - 1] : "");
+      }
+      setOpenFiles(remainingFiles);
+      setFileStates((prev) => {
+        const { [filePath]: _, ...rest } = prev;
+        return rest;
+      });
+    },
+    [openFiles, fileStates, selectedFilePath, onShowConfirm, project, updateFileState]
+  );
+
+  const setSelectedFileContent = useCallback(
+    (content: string) => {
+      if (!selectedFilePath) return;
+      updateFileState(selectedFilePath, { content, isDirty: true });
+    },
+    [selectedFilePath, updateFileState]
+  );
+
+  const manualSaveFile = useCallback(async () => {
+    if (!selectedFilePath || !project) return;
+    const fileState = fileStates[selectedFilePath];
+    if (!fileState) return;
+
+    updateFileState(selectedFilePath, { isSaving: true });
+
+    try {
+      await project.writeFile(selectedFilePath, fileState.content);
+      updateFileState(selectedFilePath, { isDirty: false, isSaving: false });
+    } catch (e: unknown) {
+      setError(`Error saving file: ${e instanceof Error ? e.message : String(e)}`);
+      updateFileState(selectedFilePath, { isSaving: false });
+    }
+  }, [selectedFilePath, project, fileStates, updateFileState]);
+
+  useEffect(() => {
+    if (project && openFiles.length > 0) {
+      openFiles.forEach((p) => {
+        if (!fileStates[p]) {
+          readAndOpenFile(p).catch((e) => console.error(e));
         }
+      });
+    }
+  }, [project]);
 
-        return () => {
-            if (debouncedWriteRef.current) {
-                clearTimeout(debouncedWriteRef.current);
-            }
-        };
-    }, [selectedFileContent, selectedFilePath, project]);
+  const currentFile = useMemo(
+    () => fileStates[selectedFilePath] ?? { content: "", isDirty: false, isSaving: false },
+    [fileStates, selectedFilePath]
+  );
 
-    const updatePreviewUrl = useCallback((url: string) => {
-        setPreviewUrl(url);
-    }, []);
-
-    return {
-        selectedFilePath,
-        selectedFileContent,
-        setSelectedFileContent,
-        previewUrl,
-        updatePreviewUrl,
-        fetchFileContent,
-        error,
-    };
+  return {
+    openFiles,
+    openFile,
+    closeFile,
+    selectedFilePath,
+    selectedFileContent: currentFile.content,
+    fileState: { isDirty: currentFile.isDirty, isSaving: currentFile.isSaving ?? false },
+    setSelectedFileContent,
+    manualSaveFile,
+    previewUrl,
+    fetchFileContent: readAndOpenFile,
+    error,
+  };
 };

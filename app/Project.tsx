@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
@@ -7,15 +7,19 @@ import { Preview } from "./components/Preview";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Timer } from "./components/Timer";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import { useContextMenu } from "./hooks/useContextMenu";
 import { ContextMenu } from './components/ContextMenu';
 import { useBuild } from "./hooks/useBuild";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
 import { useUtooProject } from "./hooks/useUtooProject";
+import { useConfirmDialog } from "./hooks/useConfirmDialog";
 import "./styles.css";
 
 const Project = () => {
+  const { dialogState, showConfirmDialog, handleDialogAction } = useConfirmDialog();
+
   const {
     project,
     isLoading,
@@ -26,14 +30,18 @@ const Project = () => {
   } = useUtooProject();
   const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem } = useFileTree(project);
   const {
+    openFiles,
+    openFile,
+    closeFile,
     selectedFilePath,
     selectedFileContent,
+    fileState,
     setSelectedFileContent,
+    manualSaveFile,
     previewUrl,
-    updatePreviewUrl,
-    fetchFileContent,
+    setPreviewUrl,
     error: fileContentError,
-  } = useFileContent(project);
+  } = useFileContent(project, showConfirmDialog);
 
   const previewRef = React.useRef<{ reload: () => void }>(null);
 
@@ -55,7 +63,7 @@ const Project = () => {
     },
     (url: string) => {
       // Automatically set the preview URL after build is complete
-      updatePreviewUrl(url);
+      setPreviewUrl(url);
     },
   );
 
@@ -176,7 +184,7 @@ const Project = () => {
                 <FileTreeItem
                   key={item.fullName}
                   item={item}
-                  onFileClick={fetchFileContent}
+                  onFileClick={openFile}
                   onDirectoryExpand={
                     item.type === "directory"
                       ? handleDirectoryExpand
@@ -207,9 +215,15 @@ const Project = () => {
 
         <Panel title="Editor" contentStyle={{ paddingTop: "0.5rem" }}>
           <Editor
-            filePath={selectedFilePath}
+            openFiles={openFiles}
+            activeFile={selectedFilePath}
             content={selectedFileContent}
+            isDirty={fileState.isDirty}
+            isSaving={fileState.isSaving}
             onContentChange={setSelectedFileContent}
+            onSwitchFile={openFile}
+            onCloseFile={closeFile}
+            onSave={manualSaveFile}
           />
         </Panel>
 
@@ -261,6 +275,13 @@ const Project = () => {
           </a>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={dialogState.isOpen}
+        title={dialogState.title}
+        onSave={() => handleDialogAction('save')}
+        onDontSave={() => handleDialogAction('dontSave')}
+        onCancel={() => handleDialogAction(null)}
+      />
     </div>
   );
 };
