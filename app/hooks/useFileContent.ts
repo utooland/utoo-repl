@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { Project as UtooProject } from "@utoo/web";
 import { serviceWorkerScope } from "../services/utooService";
 
@@ -10,13 +10,14 @@ interface FileState {
 
 export const useFileContent = (
   project: UtooProject | null,
-  onShowConfirm?: (title: string) => Promise<'save' | 'dontSave' | null>
+  onShowConfirm?: (title: string) => Promise<"save" | "dontSave" | null>
 ) => {
   const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx"]);
   const [fileStates, setFileStates] = useState<Record<string, FileState>>({});
   const [selectedFilePath, setSelectedFilePath] = useState<string>("src/index.tsx");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const initializingRef = useRef(false);
 
   const updateFileState = useCallback((filePath: string, updates: Partial<FileState>) => {
     setFileStates((prev) => ({
@@ -62,10 +63,10 @@ export const useFileContent = (
         const fileName = filePath.split("/").pop();
         const title = `Do you want to save the changes you made to ${fileName}?`;
         const action = await onShowConfirm?.(title);
-        
+
         if (action === null) {
           return;
-        } else if (action === 'save') {
+        } else if (action === "save") {
           try {
             updateFileState(filePath, { isSaving: true });
             await project?.writeFile(filePath, fileStates[filePath].content);
@@ -116,13 +117,14 @@ export const useFileContent = (
   }, [selectedFilePath, project, fileStates, updateFileState]);
 
   useEffect(() => {
-    if (project && openFiles.length > 0) {
-      openFiles.forEach((p) => {
-        if (!fileStates[p]) {
-          readAndOpenFile(p).catch((e) => console.error(e));
-        }
-      });
-    }
+    if (!project || initializingRef.current) return;
+    
+    initializingRef.current = true;
+    openFiles.forEach((p) => {
+      if (!fileStates[p]) {
+        readAndOpenFile(p);
+      }
+    });
   }, [project]);
 
   const currentFile = useMemo(
@@ -140,6 +142,7 @@ export const useFileContent = (
     setSelectedFileContent,
     manualSaveFile,
     previewUrl,
+    setPreviewUrl,
     fetchFileContent: readAndOpenFile,
     error,
   };

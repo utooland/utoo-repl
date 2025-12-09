@@ -39,10 +39,7 @@ export const Editor: React.FC<EditorProps> = ({
   onCloseFile,
   onSave,
 }) => {
-  const modelUri = useMemo(
-    () => (activeFile ? `file:///${activeFile.replace(/^\.\//, "")}` : undefined),
-    [activeFile]
-  );
+  const modelUri = useMemo(() => (activeFile ? `file:///${activeFile.replace(/^\.\//, "")}` : undefined), [activeFile]);
   const language = useMemo(() => getLanguage(activeFile), [activeFile]);
   const hasOpenFiles = openFiles.length > 0;
 
@@ -81,7 +78,9 @@ export const Editor: React.FC<EditorProps> = ({
                 <span className="truncate max-w-[150px]">{name}</span>
                 {isDirtyForFile && (
                   <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"}`}
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"
+                    }`}
                     title={isSaving ? "Saving..." : "Unsaved changes"}
                   />
                 )}
@@ -173,12 +172,8 @@ export const Editor: React.FC<EditorProps> = ({
             <div className="flex flex-col items-center gap-4 text-center">
               <div className="text-6xl opacity-40">📄</div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-300 mb-2">
-                  No files open
-                </h3>
-                <p className="text-sm text-slate-400">
-                  Select a file from the project tree to start editing
-                </p>
+                <h3 className="text-lg font-semibold text-slate-300 mb-2">No files open</h3>
+                <p className="text-sm text-slate-400">Select a file from the project tree to start editing</p>
               </div>
             </div>
           </div>

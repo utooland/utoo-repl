@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback } from "react";
+import React, { useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Timer } from "./components/Timer";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { useContextMenu } from "./hooks/useContextMenu";
-import { ContextMenu } from './components/ContextMenu';
+import { ContextMenu } from "./components/ContextMenu";
 import { useBuild } from "./hooks/useBuild";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
@@ -20,14 +20,7 @@ import "./styles.css";
 const Project = () => {
   const { dialogState, showConfirmDialog, handleDialogAction } = useConfirmDialog();
 
-  const {
-    project,
-    isLoading,
-    error: projectError,
-    initProgress,
-    initMessage,
-    initTime,
-  } = useUtooProject();
+  const { project, isLoading, error: projectError, initProgress, initMessage, initTime } = useUtooProject();
   const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem } = useFileTree(project);
   const {
     openFiles,
@@ -64,18 +57,18 @@ const Project = () => {
     (url: string) => {
       // Automatically set the preview URL after build is complete
       setPreviewUrl(url);
-    },
+    }
   );
 
   const error = projectError || fileContentError || buildError;
 
   const memoizedFileTree = useMemo(() => fileTree, [fileTree]);
 
-  const { 
-    contextMenu, 
-    handleContextMenu, 
-    closeContextMenu, 
-    handleCreateFile, 
+  const {
+    contextMenu,
+    handleContextMenu,
+    closeContextMenu,
+    handleCreateFile,
     handleCreateFolder,
     handleDelete,
     creatingItem,
@@ -86,7 +79,7 @@ const Project = () => {
 
   const handleCreateConfirm = async (name: string) => {
     if (!creatingItem) return;
-    
+
     try {
       const isFile = creatingItem.type === "file";
       isFile ? await createFile(creatingItem.parentPath, name) : await createFolder(creatingItem.parentPath, name);
@@ -138,44 +131,24 @@ const Project = () => {
 
       {/* Main content area */}
       <div className="flex-1 grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] relative z-10">
-        <Panel
-          title="Project"
-          actions={buildButton}
-          contentStyle={{ padding: "0.5rem 1rem" }}
-        >
-          {error && (
-            <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>
-          )}
-          {(isLoading ||
-            (initProgress !== undefined &&
-              initProgress > 0 &&
-              initProgress < 100)) && (
+        <Panel title="Project" actions={buildButton} contentStyle={{ padding: "0.5rem 1rem" }}>
+          {error && <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>}
+          {(isLoading || (initProgress !== undefined && initProgress > 0 && initProgress < 100)) && (
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">
-                  {initMessage || "Initializing project..."}
-                </span>
+                <span className="text-sm text-slate-200 font-medium">{initMessage || "Initializing project..."}</span>
                 <Timer time={initTime} format="seconds" />
               </div>
-              <Progress
-                value={initProgress || 0}
-                className="h-1.5 bg-secondary/20"
-              />
+              <Progress value={initProgress || 0} className="h-1.5 bg-secondary/20" />
             </div>
           )}
-          {(isBuilding ||
-            (buildProgress !== undefined && buildProgress > 0)) && (
+          {(isBuilding || (buildProgress !== undefined && buildProgress > 0)) && (
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">
-                  {buildMessage || "Building project..."}
-                </span>
+                <span className="text-sm text-slate-200 font-medium">{buildMessage || "Building project..."}</span>
                 <Timer time={buildTime} format="seconds" />
               </div>
-              <Progress
-                value={buildProgress || 0}
-                className="h-1.5 bg-secondary/20"
-              />
+              <Progress value={buildProgress || 0} className="h-1.5 bg-secondary/20" />
             </div>
           )}
           {!isLoading && !error && (
@@ -185,11 +158,7 @@ const Project = () => {
                   key={item.fullName}
                   item={item}
                   onFileClick={openFile}
-                  onDirectoryExpand={
-                    item.type === "directory"
-                      ? handleDirectoryExpand
-                      : undefined
-                  }
+                  onDirectoryExpand={item.type === "directory" ? handleDirectoryExpand : undefined}
                   selectedFile={selectedFilePath} // Pass the selectedFilePath state here
                   onContextMenu={handleContextMenu}
                   creatingItem={creatingItem}
@@ -278,8 +247,8 @@ const Project = () => {
       <ConfirmDialog
         isOpen={dialogState.isOpen}
         title={dialogState.title}
-        onSave={() => handleDialogAction('save')}
-        onDontSave={() => handleDialogAction('dontSave')}
+        onSave={() => handleDialogAction("save")}
+        onDontSave={() => handleDialogAction("dontSave")}
         onCancel={() => handleDialogAction(null)}
       />
     </div>

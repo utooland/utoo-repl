@@ -58,11 +58,11 @@ const InlineInput: React.FC<{
   );
 };
 
-export const FileTreeItem: React.FC<FileTreeItemProps> = ({ 
-  item, 
-  onFileClick, 
-  onDirectoryExpand, 
-  selectedFile, 
+export const FileTreeItem: React.FC<FileTreeItemProps> = ({
+  item,
+  onFileClick,
+  onDirectoryExpand,
+  selectedFile,
   onContextMenu,
   creatingItem,
   onCreateConfirm,
@@ -92,7 +92,7 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
     }
   };
 
-  const renderIcon = () => (
+  const renderIcon = () =>
     item.type === "directory" ? (
       isExpanded ? (
         <FolderOpen className="w-4 h-4 text-purple-400 flex-shrink-0" />
@@ -101,8 +101,7 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
       )
     ) : (
       <File className="w-4 h-4 text-slate-400 flex-shrink-0" />
-    )
-  );
+    );
 
   useEffect(() => {
     if (shouldShowInput && !isExpanded) {
@@ -138,7 +137,10 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
         <div className="flex items-center gap-2 flex-1 min-h-[1.25rem]">
           {item.type === "directory" ? (
             <ChevronRight
-              className={cn("w-4 h-4 flex-shrink-0 transform transition-transform duration-150", isExpanded && "rotate-90")}
+              className={cn(
+                "w-4 h-4 flex-shrink-0 transform transition-transform duration-150",
+                isExpanded && "rotate-90"
+              )}
               onClick={handleToggleExpand}
             />
           ) : (
@@ -172,19 +174,20 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
               />
             </li>
           )}
-          {item.children && item.children.map((child) => (
-            <FileTreeItem
-              key={child.fullName}
-              item={child}
-              onFileClick={onFileClick}
-              onDirectoryExpand={onDirectoryExpand}
-              selectedFile={selectedFile}
-              onContextMenu={onContextMenu}
-              creatingItem={creatingItem}
-              onCreateConfirm={onCreateConfirm}
-              onCreateCancel={onCreateCancel}
-            />
-          ))}
+          {item.children &&
+            item.children.map((child) => (
+              <FileTreeItem
+                key={child.fullName}
+                item={child}
+                onFileClick={onFileClick}
+                onDirectoryExpand={onDirectoryExpand}
+                selectedFile={selectedFile}
+                onContextMenu={onContextMenu}
+                creatingItem={creatingItem}
+                onCreateConfirm={onCreateConfirm}
+                onCreateCancel={onCreateCancel}
+              />
+            ))}
         </ul>
       )}
     </li>

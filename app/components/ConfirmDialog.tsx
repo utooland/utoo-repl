@@ -10,13 +10,7 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
-  isOpen,
-  title,
-  onSave,
-  onDontSave,
-  onCancel,
-}) => {
+export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ isOpen, title, onSave, onDontSave, onCancel }) => {
   if (!isOpen) return null;
 
   return (
@@ -40,10 +34,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               >
                 Don't Save
               </Button>
-              <Button
-                onClick={onSave}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium"
-              >
+              <Button onClick={onSave} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium">
                 Save
               </Button>
             </div>

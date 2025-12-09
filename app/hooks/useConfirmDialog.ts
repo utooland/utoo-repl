@@ -10,20 +10,23 @@ export const useConfirmDialog = () => {
     isOpen: false,
     title: "",
   });
-  const [resolveDialog, setResolveDialog] = useState<((value: 'save' | 'dontSave' | null) => void) | null>(null);
+  const [resolveDialog, setResolveDialog] = useState<((value: "save" | "dontSave" | null) => void) | null>(null);
 
-  const showConfirmDialog = useCallback((title: string): Promise<'save' | 'dontSave' | null> => {
+  const showConfirmDialog = useCallback((title: string): Promise<"save" | "dontSave" | null> => {
     return new Promise((resolve) => {
       setResolveDialog(() => resolve);
       setDialogState({ isOpen: true, title });
     });
   }, []);
 
-  const handleDialogAction = useCallback((action: 'save' | 'dontSave' | null) => {
-    resolveDialog?.(action);
-    setDialogState({ isOpen: false, title: "" });
-    setResolveDialog(null);
-  }, [resolveDialog]);
+  const handleDialogAction = useCallback(
+    (action: "save" | "dontSave" | null) => {
+      resolveDialog?.(action);
+      setDialogState({ isOpen: false, title: "" });
+      setResolveDialog(null);
+    },
+    [resolveDialog]
+  );
 
   return {
     dialogState,
