@@ -7,33 +7,34 @@ import { Preview } from "./components/Preview";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Timer } from "./components/Timer";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import { useContextMenu } from "./hooks/useContextMenu";
-import { ContextMenu } from './components/ContextMenu';
+import { ContextMenu } from "./components/ContextMenu";
 import { useBuild } from "./hooks/useBuild";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
 import { useUtooProject } from "./hooks/useUtooProject";
+import { useConfirmDialog } from "./hooks/useConfirmDialog";
 import "./styles.css";
 
 const Project = () => {
-  const {
-    project,
-    isLoading,
-    error: projectError,
-    initProgress,
-    initMessage,
-    initTime,
-  } = useUtooProject();
+  const { dialogState, showConfirmDialog, handleDialogAction } = useConfirmDialog();
+
+  const { project, isLoading, error: projectError, initProgress, initMessage, initTime } = useUtooProject();
   const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem } = useFileTree(project);
   const {
+    openFiles,
+    openFile,
+    closeFile,
     selectedFilePath,
     selectedFileContent,
+    fileState,
     setSelectedFileContent,
+    manualSaveFile,
     previewUrl,
-    updatePreviewUrl,
-    fetchFileContent,
+    setPreviewUrl,
     error: fileContentError,
-  } = useFileContent(project);
+  } = useFileContent(project, showConfirmDialog);
 
   const previewRef = React.useRef<{ reload: () => void }>(null);
 
@@ -55,19 +56,19 @@ const Project = () => {
     },
     (url: string) => {
       // Automatically set the preview URL after build is complete
-      updatePreviewUrl(url);
-    },
+      setPreviewUrl(url);
+    }
   );
 
   const error = projectError || fileContentError || buildError;
 
   const memoizedFileTree = useMemo(() => fileTree, [fileTree]);
 
-  const { 
-    contextMenu, 
-    handleContextMenu, 
-    closeContextMenu, 
-    handleCreateFile, 
+  const {
+    contextMenu,
+    handleContextMenu,
+    closeContextMenu,
+    handleCreateFile,
     handleCreateFolder,
     handleDelete,
     creatingItem,
@@ -78,7 +79,7 @@ const Project = () => {
 
   const handleCreateConfirm = async (name: string) => {
     if (!creatingItem) return;
-    
+
     try {
       const isFile = creatingItem.type === "file";
       isFile ? await createFile(creatingItem.parentPath, name) : await createFolder(creatingItem.parentPath, name);
@@ -130,44 +131,24 @@ const Project = () => {
 
       {/* Main content area */}
       <div className="flex-1 grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] relative z-10">
-        <Panel
-          title="Project"
-          actions={buildButton}
-          contentStyle={{ padding: "0.5rem 1rem" }}
-        >
-          {error && (
-            <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>
-          )}
-          {(isLoading ||
-            (initProgress !== undefined &&
-              initProgress > 0 &&
-              initProgress < 100)) && (
+        <Panel title="Project" actions={buildButton} contentStyle={{ padding: "0.5rem 1rem" }}>
+          {error && <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>}
+          {(isLoading || (initProgress !== undefined && initProgress > 0 && initProgress < 100)) && (
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">
-                  {initMessage || "Initializing project..."}
-                </span>
+                <span className="text-sm text-slate-200 font-medium">{initMessage || "Initializing project..."}</span>
                 <Timer time={initTime} format="seconds" />
               </div>
-              <Progress
-                value={initProgress || 0}
-                className="h-1.5 bg-secondary/20"
-              />
+              <Progress value={initProgress || 0} className="h-1.5 bg-secondary/20" />
             </div>
           )}
-          {(isBuilding ||
-            (buildProgress !== undefined && buildProgress > 0)) && (
+          {(isBuilding || (buildProgress !== undefined && buildProgress > 0)) && (
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">
-                  {buildMessage || "Building project..."}
-                </span>
+                <span className="text-sm text-slate-200 font-medium">{buildMessage || "Building project..."}</span>
                 <Timer time={buildTime} format="seconds" />
               </div>
-              <Progress
-                value={buildProgress || 0}
-                className="h-1.5 bg-secondary/20"
-              />
+              <Progress value={buildProgress || 0} className="h-1.5 bg-secondary/20" />
             </div>
           )}
           {!isLoading && !error && (
@@ -176,12 +157,8 @@ const Project = () => {
                 <FileTreeItem
                   key={item.fullName}
                   item={item}
-                  onFileClick={fetchFileContent}
-                  onDirectoryExpand={
-                    item.type === "directory"
-                      ? handleDirectoryExpand
-                      : undefined
-                  }
+                  onFileClick={openFile}
+                  onDirectoryExpand={item.type === "directory" ? handleDirectoryExpand : undefined}
                   selectedFile={selectedFilePath} // Pass the selectedFilePath state here
                   onContextMenu={handleContextMenu}
                   creatingItem={creatingItem}
@@ -207,9 +184,15 @@ const Project = () => {
 
         <Panel title="Editor" contentStyle={{ paddingTop: "0.5rem" }}>
           <Editor
-            filePath={selectedFilePath}
+            openFiles={openFiles}
+            activeFile={selectedFilePath}
             content={selectedFileContent}
+            isDirty={fileState.isDirty}
+            isSaving={fileState.isSaving}
             onContentChange={setSelectedFileContent}
+            onSwitchFile={openFile}
+            onCloseFile={closeFile}
+            onSave={manualSaveFile}
           />
         </Panel>
 
@@ -261,6 +244,13 @@ const Project = () => {
           </a>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={dialogState.isOpen}
+        title={dialogState.title}
+        onSave={() => handleDialogAction("save")}
+        onDontSave={() => handleDialogAction("dontSave")}
+        onCancel={() => handleDialogAction(null)}
+      />
     </div>
   );
 };
