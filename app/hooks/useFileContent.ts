@@ -8,10 +8,25 @@ interface FileState {
   isSaving?: boolean;
 }
 
+interface UseFileContentReturn {
+  openFiles: string[];
+  openFile: (filePath: string) => Promise<void>;
+  closeFile: (filePath: string) => Promise<void>;
+  selectedFilePath: string;
+  selectedFileContent: string;
+  fileState: { isDirty: boolean; isSaving: boolean };
+  setSelectedFileContent: (content: string) => void;
+  manualSaveFile: () => Promise<void>;
+  previewUrl: string;
+  setPreviewUrl: (url: string) => void;
+  fetchFileContent: (filePath: string) => Promise<void>;
+  error: string;
+}
+
 export const useFileContent = (
   project: UtooProject | null,
   onShowConfirm?: (title: string) => Promise<"save" | "dontSave" | null>
-) => {
+): UseFileContentReturn => {
   const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx"]);
   const [fileStates, setFileStates] = useState<Record<string, FileState>>({});
   const [selectedFilePath, setSelectedFilePath] = useState<string>("src/index.tsx");
@@ -118,7 +133,7 @@ export const useFileContent = (
 
   useEffect(() => {
     if (!project || initializingRef.current) return;
-    
+
     initializingRef.current = true;
     openFiles.forEach((p) => {
       if (!fileStates[p]) {
