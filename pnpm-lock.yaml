@@ -18,8 +18,8 @@ importers:
         specifier: ^1.2.3
         version: 1.2.3(@types/react@19.1.12)(react@19.1.0)
       '@utoo/web':
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.0.7
+        version: 1.0.7
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -399,8 +399,8 @@ packages:
     resolution: {integrity: sha512-CATHVePPWDirHvej0dR2x6nYPHjXgggpiMPOC846z1a9En20r3G1xrMkDBcNDbKlWJ2uF+kyR3qzcrLCCH+YCw==}
     engines: {node: '>= 20'}
 
-  '@utoo/web@1.0.3':
-    resolution: {integrity: sha512-Q16ful9O9/s6gr308E3ZvBZ8pqJX+HAnpfCgZEIXd/+SsQUJUUoyFWAs22tmLoOcuSYfYexA2xdH2EdQlzHAjg==}
+  '@utoo/web@1.0.7':
+    resolution: {integrity: sha512-lone8IY5BubxdRAGLfBJCzrFXTKkEVp6shB5cMqG2pRVSysxCcB4u2UYjBAIQHQ70xc8qcwIRVYsVM6o4+lX0w==}
     engines: {node: '>= 20'}
 
   '@webassemblyjs/ast@1.14.1':
@@ -1595,7 +1595,7 @@ snapshots:
       '@babel/code-frame': 7.22.5
       picocolors: 1.1.1
 
-  '@utoo/web@1.0.3':
+  '@utoo/web@1.0.7':
     dependencies:
       '@utoo/pack-shared': 0.0.7
       comlink: 4.4.2

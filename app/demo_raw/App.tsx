@@ -2,6 +2,7 @@
 import React from 'react';
 
 import { Flex, Layout } from 'antd';
+import "./App.less";
 
 const { Header, Footer, Sider, Content } = Layout;
 
@@ -53,10 +54,10 @@ const App: React.FC = () => (
     <Layout style={layoutStyle}>
       <Header style={headerStyle}>Header</Header>
       <Layout>
-      <Sider width="25%" style={siderStyle}>
-      Sider
-      </Sider>
-      <Content style={contentStyle}>Content</Content>
+        <Sider width="25%" style={siderStyle}>
+          Sider
+        </Sider>
+        <Content style={contentStyle}>Content</Content>
       </Layout>
       <Footer style={footerStyle}>Footer</Footer>
     </Layout>
@@ -64,22 +65,22 @@ const App: React.FC = () => (
     <Layout style={layoutStyle}>
       <Header style={headerStyle}>Header</Header>
       <Layout>
-      <Content style={contentStyle}>Content</Content>
-      <Sider width="25%" style={siderStyle}>
-      Sider
-      </Sider>
+        <Content style={contentStyle}>Content</Content>
+        <Sider width="25%" style={siderStyle}>
+          Sider
+        </Sider>
       </Layout>
       <Footer style={footerStyle}>Footer</Footer>
     </Layout>
 
     <Layout style={layoutStyle}>
       <Sider width="25%" style={siderStyle}>
-      Sider
+        Sider
       </Sider>
       <Layout>
-      <Header style={headerStyle}>Header</Header>
-      <Content style={contentStyle}>Content</Content>
-      <Footer style={footerStyle}>Footer</Footer>
+        <Header style={headerStyle}>Header</Header>
+        <Content style={contentStyle}>Content</Content>
+        <Footer style={footerStyle}>Footer</Footer>
       </Layout>
     </Layout>
   </Flex>
