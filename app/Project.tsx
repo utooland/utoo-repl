@@ -130,11 +130,11 @@ const Project = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent pointer-events-none z-0" />
 
       {/* Main content area */}
-      <div className="flex-1 grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] relative z-10">
-        <Panel title="Project" actions={buildButton} contentStyle={{ padding: "0.5rem 1rem" }}>
+      <div className="grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] h-[calc(100vh-3rem)]">
+        <Panel title="Project" actions={buildButton}>
           {error && <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>}
           {(isLoading || (initProgress !== undefined && initProgress > 0 && initProgress < 100)) && (
-            <div className="mb-4">
+            <div className="mb-4 px-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-slate-200 font-medium">{initMessage || "Initializing project..."}</span>
                 <Timer time={initTime} format="seconds" />
@@ -152,7 +152,7 @@ const Project = () => {
             </div>
           )}
           {!isLoading && !error && (
-            <ul className="flex flex-col gap-1 p-0 items-start">
+            <ul className="flex flex-col gap-1 px-4 py-2 items-start">
               {memoizedFileTree.map((item) => (
                 <FileTreeItem
                   key={item.fullName}
@@ -211,8 +211,8 @@ const Project = () => {
           />
         </Panel>
       </div>
-      {/* Footer area */}
-      <div className="flex items-center justify-between px-6 py-2 bg-card/20 backdrop-blur-sm border-t border-border/30 z-10">
+
+      <div className="flex items-center justify-between px-6 py-2 bg-card/20 backdrop-blur-sm border-t border-border/30">
         <div className="flex items-center gap-2">
           <img
             src="https://avatars.githubusercontent.com/u/217533135?s=200&v=4"

@@ -73,6 +73,7 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
   const isSelected = selectedFile && selectedFile === item.fullName;
   const depth = item.fullName.split("/").length;
   const shouldShowInput = creatingItem?.parentPath === item.fullName && item.type === "directory";
+  const isRoot = item.fullName === ".";
 
   const handleToggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -124,7 +125,9 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
       <div
         className={cn(
           "flex items-center py-1.5 px-2 rounded-md cursor-pointer transition-colors duration-150 w-full min-h-[2.25rem] select-none",
-          isSelected ? "bg-purple-500/20 text-white" : "text-slate-300 hover:bg-slate-700/50"
+          isSelected ? "bg-purple-500/20 text-white" : "text-slate-300 hover:bg-slate-700/50",
+          isRoot &&
+            "sticky top-0 z-20 bg-gradient-to-r from-slate-800/95 to-slate-900/95 backdrop-blur-md border-b border-purple-500/30 shadow-lg"
         )}
         onClick={handleItemClick}
         onContextMenu={(e) => {

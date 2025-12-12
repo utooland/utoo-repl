@@ -12,7 +12,7 @@ interface PanelProps {
 export const Panel: React.FC<PanelProps> = ({ title, children, actions, style, contentStyle }) => {
   return (
     <Card 
-      className="flex flex-col h-full bg-card/80 backdrop-blur-sm border-border/50 rounded-none"
+      className="flex flex-col bg-card/80 backdrop-blur-sm border-border/50 rounded-none h-[calc(100vh-3rem)]"
       style={style}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 h-9 py-1 px-4 border-b border-border/50 bg-gradient-to-r from-purple-500/10 to-pink-500/10">

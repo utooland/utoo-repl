@@ -25,15 +25,12 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
   onProgress?.(20, "Creating project files...");
   await initUtooProject(projectInstance);
 
-  onProgress?.(40, "Installing dependencies...");
-  await installDependencies(projectInstance, onProgress);
-
-  onProgress?.(100, "Project initialization complete!");
+  onProgress?.(30, "Project files created successfully!");
 
   return projectInstance;
 };
 
-const installDependencies = async (project: UtooProject, onProgress?: ProgressCallback): Promise<void> => {
+export const installDependencies = async (project: UtooProject, onProgress?: ProgressCallback): Promise<void> => {
   console.log(
     "%cOPFS Project:%c Start to install dependencies.",
     "color: blue;",
