@@ -59,7 +59,7 @@ export const Editor: React.FC<EditorProps> = ({
   }, [handleKeyDown]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="h-full flex flex-col">
       {hasOpenFiles && (
         <div className="flex items-center gap-1 px-2 py-1 bg-card/10 border-b border-border/20 overflow-x-auto flex-shrink-0">
           {openFiles.map((file) => {
@@ -77,8 +77,7 @@ export const Editor: React.FC<EditorProps> = ({
                 <span className="truncate max-w-[150px]">{name}</span>
                 {isDirtyForFile && (
                   <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"
-                      }`}
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"}`}
                     title={isSaving ? "Saving..." : "Unsaved changes"}
                   />
                 )}

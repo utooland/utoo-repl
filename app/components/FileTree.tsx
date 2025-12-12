@@ -121,7 +121,7 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
   }, [selectedFile, item.fullName, item.type, onDirectoryExpand]);
 
   return (
-    <li className={cn("flex flex-col text-sm w-full")}>
+    <li className="flex flex-col text-sm w-full">
       <div
         className={cn(
           "flex items-center py-1.5 px-2 rounded-md cursor-pointer transition-colors duration-150 w-full min-h-[2.25rem] select-none",
