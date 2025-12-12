@@ -70,14 +70,17 @@ export const Editor: React.FC<EditorProps> = ({
               <div
                 key={file}
                 onClick={() => onSwitchFile(file)}
-                className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer text-sm whitespace-nowrap transition-all select-none ${isActive ? "bg-purple-600/30 text-white shadow-lg" : "text-slate-300 hover:bg-slate-700/30"
-                  }`}
+                className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer text-sm whitespace-nowrap transition-all select-none ${
+                  isActive ? "bg-purple-600/30 text-white shadow-lg" : "text-slate-300 hover:bg-slate-700/30"
+                }`}
                 title={file}
               >
                 <span className="truncate max-w-[150px]">{name}</span>
                 {isDirtyForFile && (
                   <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"}`}
+                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"
+                  }`}
                     title={isSaving ? "Saving..." : "Unsaved changes"}
                   />
                 )}

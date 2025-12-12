@@ -37,13 +37,12 @@ export const useUtooProject = () => {
                 } catch (e) {
                     console.error("Dependency installation failed:", e);
                     setInitMessage("Dependency installation failed.");
-                } finally {
-                    stopInitTimer();
                 }
             } catch (e) {
                 const errorMessage = e instanceof Error ? e.message : String(e);
                 setError(`Initialization failed: ${errorMessage}`);
                 setIsLoading(false);
+            } finally {
                 stopInitTimer();
             }
         };
