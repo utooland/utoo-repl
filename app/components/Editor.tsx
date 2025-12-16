@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
 
 interface EditorProps {
@@ -53,7 +53,7 @@ export const Editor: React.FC<EditorProps> = ({
     [isDirty, onSave]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
@@ -61,7 +61,7 @@ export const Editor: React.FC<EditorProps> = ({
   return (
     <div className="h-full flex flex-col">
       {hasOpenFiles && (
-        <div className="flex items-center gap-1 px-2 py-1 bg-card/10 border-b border-border/20 overflow-x-auto">
+        <div className="flex items-center gap-1 px-2 py-1 bg-card/10 border-b border-border/20 overflow-x-auto flex-shrink-0">
           {openFiles.map((file) => {
             const name = file.split("/").pop() || file;
             const isActive = file === activeFile;
@@ -78,9 +78,9 @@ export const Editor: React.FC<EditorProps> = ({
                 <span className="truncate max-w-[150px]">{name}</span>
                 {isDirtyForFile && (
                   <span
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"
-                    }`}
+                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"
+                  }`}
                     title={isSaving ? "Saving..." : "Unsaved changes"}
                   />
                 )}
@@ -100,11 +100,11 @@ export const Editor: React.FC<EditorProps> = ({
         </div>
       )}
 
-      <div className="flex-1">
-        {hasOpenFiles ? (
+      {hasOpenFiles ? (
+        <div className="flex-1 min-h-0">
           <MonacoEditor
-            height="100%"
             width="100%"
+            height="100%"
             path={modelUri}
             language={language}
             value={content}
@@ -167,18 +167,18 @@ export const Editor: React.FC<EditorProps> = ({
               monaco.editor.setTheme("catppuccin-mocha");
             }}
           />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <div className="flex flex-col items-center gap-4 text-center">
-              <div className="text-6xl opacity-40">📄</div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-300 mb-2">No files open</h3>
-                <p className="text-sm text-slate-400">Select a file from the project tree to start editing</p>
-              </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center flex-1">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <div className="text-6xl opacity-40">📄</div>
+            <div>
+              <h3 className="text-lg font-semibold text-slate-300 mb-2">No files open</h3>
+              <p className="text-sm text-slate-400">Select a file from the project tree to start editing</p>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

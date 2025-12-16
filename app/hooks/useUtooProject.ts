@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import type { Project as UtooProject } from "@utoo/web";
-import { initializeProject, type ProgressCallback } from "../services/utooService";
+import { initializeProject, installDependencies, type ProgressCallback } from "../services/utooService";
 import { useTimer } from "./useTimer";
 
 export const useUtooProject = () => {
@@ -21,22 +21,29 @@ export const useUtooProject = () => {
             setInitProgress(0);
             setInitMessage("Starting project initialization...");
             startInitTimer();
-            
+
             const onProgress: ProgressCallback = (progress, message) => {
                 setInitProgress(progress);
                 setInitMessage(message);
             };
-            
+
             try {
                 const projectInstance = await initializeProject(onProgress);
                 setProject(projectInstance);
+                setIsLoading(false);
+
+                try {
+                    await installDependencies(projectInstance, onProgress);
+                } catch (e) {
+                    console.error("Dependency installation failed:", e);
+                    setInitMessage("Dependency installation failed.");
+                }
             } catch (e) {
                 const errorMessage = e instanceof Error ? e.message : String(e);
                 setError(`Initialization failed: ${errorMessage}`);
-            } finally {
                 setIsLoading(false);
+            } finally {
                 stopInitTimer();
-                // Keep the progress bar displayed, do not reset
             }
         };
 
