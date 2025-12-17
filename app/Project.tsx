@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect } from "react";
 import { toast } from "sonner";
+import { FolderInput } from "lucide-react";
 import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
 import { Panel } from "./components/Panel";
@@ -15,13 +16,15 @@ import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
 import { useUtooProject } from "./hooks/useUtooProject";
 import { useConfirmDialog } from "./hooks/useConfirmDialog";
+import { useImportDirectory } from "./hooks/useImportDirectory";
 import "./styles.css";
 
 const Project = () => {
   const { dialogState, showConfirmDialog, handleDialogAction } = useConfirmDialog();
 
   const { project, isLoading, error: projectError, initProgress, initMessage, initTime } = useUtooProject();
-  const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem } = useFileTree(project);
+  const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem, refresh: refreshFileTree } = useFileTree(project);
+  const { importDirectory, isImporting } = useImportDirectory(project, refreshFileTree);
   const {
     openFiles,
     openFile,
@@ -122,6 +125,19 @@ const Project = () => {
     </Button>
   );
 
+  const importButton = (
+    <Button
+      onClick={importDirectory}
+      disabled={isImporting || !project}
+      variant="ghost"
+      size="icon"
+      title="Import Folder"
+      className="text-slate-400 hover:text-white mr-2"
+    >
+      <FolderInput className="w-4 h-4" />
+    </Button>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
       {/* Tech-style background decoration */}
@@ -131,7 +147,12 @@ const Project = () => {
 
       {/* Main content area */}
       <div className="grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] h-[calc(100vh-3rem)]">
-        <Panel title="Project" actions={buildButton}>
+        <Panel title="Project" actions={
+          <div className="flex items-center">
+            {importButton}
+            {buildButton}
+          </div>
+        }>
           {error && <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>}
           {(isLoading || (initProgress !== undefined && initProgress > 0 && initProgress < 100)) && (
             <div className="mb-4 px-4">

@@ -155,5 +155,11 @@ export const useFileTree = (project: UtooProject | null) => {
         [project, updateTreeWithChildren],
     );
 
-    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder, deleteItem };
+    const refresh = useCallback(() => {
+        if (project) {
+            buildInitialFileTree(project);
+        }
+    }, [project, buildInitialFileTree]);
+
+    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder, deleteItem, refresh };
 };
