@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from "react";
 import { toast } from "sonner";
-import { FolderInput } from "lucide-react";
+import { FolderInput, Trash2 } from "lucide-react";
 import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
 import { Panel } from "./components/Panel";
@@ -23,7 +23,7 @@ const Project = () => {
   const { dialogState, showConfirmDialog, handleDialogAction } = useConfirmDialog();
 
   const { project, isLoading, error: projectError, initProgress, initMessage, initTime } = useUtooProject();
-  const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem, refresh: refreshFileTree } = useFileTree(project);
+  const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem, refresh: refreshFileTree, clearAll } = useFileTree(project);
   const { importDirectory, isImporting } = useImportDirectory(project, refreshFileTree);
   const {
     openFiles,
@@ -107,6 +107,28 @@ const Project = () => {
     }
   };
 
+  const handleClearAll = () => {
+    toast("Are you sure you want to clear all files?", {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Clear All",
+        onClick: async () => {
+          try {
+            await clearAll();
+            toast.success("Project cleared successfully");
+          } catch (error) {
+            console.error("Error clearing project:", error);
+            toast.error("Failed to clear project");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+    });
+  };
+
   useEffect(() => {
     if (deletingItem) {
       handleDeleteConfirm();
@@ -138,6 +160,19 @@ const Project = () => {
     </Button>
   );
 
+  const clearButton = (
+    <Button
+      onClick={handleClearAll}
+      disabled={!project}
+      variant="ghost"
+      size="icon"
+      title="Clear All Files"
+      className="text-slate-400 hover:text-red-400 mr-2"
+    >
+      <Trash2 className="w-4 h-4" />
+    </Button>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
       {/* Tech-style background decoration */}
@@ -149,6 +184,7 @@ const Project = () => {
       <div className="grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] h-[calc(100vh-3rem)]">
         <Panel title="Project" actions={
           <div className="flex items-center">
+            {clearButton}
             {importButton}
             {buildButton}
           </div>

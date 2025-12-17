@@ -161,5 +161,20 @@ export const useFileTree = (project: UtooProject | null) => {
         }
     }, [project, buildInitialFileTree]);
 
-    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder, deleteItem, refresh };
+    const clearAll = useCallback(async () => {
+        if (!project) return;
+        try {
+            const rootItems = await project.readdir(".");
+            for (const item of rootItems) {
+               // Using rmdir for everything based on current workaround
+               await project.rmdir(item.name, { recursive: true });
+            }
+            await refresh();
+        } catch (e) {
+            console.error("Error clearing project:", e);
+            throw e;
+        }
+    }, [project, refresh]);
+
+    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder, deleteItem, refresh, clearAll };
 };
