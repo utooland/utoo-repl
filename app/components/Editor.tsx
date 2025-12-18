@@ -138,7 +138,6 @@ export const Editor: React.FC<EditorProps> = ({
               monaco.languages.css.cssDefaults.setOptions({ validate: false });
               monaco.languages.json.jsonDefaults.setDiagnosticsOptions({ validate: false });
               monaco.languages.html.htmlDefaults.setOptions({
-                validate: false,
                 format: {
                   tabSize: 2,
                   insertSpaces: true,
