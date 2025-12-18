@@ -126,7 +126,7 @@ const TailwindExamples: React.FC = () => {
         <div className="p-6 bg-white rounded-xl shadow-lg">
           <h3 className="text-lg font-semibold mb-2">@apply Directive</h3>
           <p className="text-slate-500 mb-4">
-            The button below uses a custom class <code>.-t</code> defined in CSS
+            The button below uses a custom class <code>.btn-primary-t</code> defined in CSS
             using <code>@apply</code>.
           </p>
           <button className="btn-primary-t">Click me</button>

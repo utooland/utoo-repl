@@ -19,7 +19,7 @@ import TailwindConfig from "!!raw-loader!./demo_raw/tailwind.config.js";
 // @ts-ignore
 import IndexCss from "!!raw-loader!./demo_raw/index.css";
 
-export const demoFiles: Record<string, any> = {
+export const demoFiles: Record<string, string> = {
   "src/index.tsx": IndexTsx,
   "src/App.tsx": AppTsx,
   "src/App.less": AppLess,

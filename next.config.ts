@@ -68,7 +68,7 @@ const nextConfig: NextConfig = {
         new CopyPlugin({
           patterns: [
             {
-              from: path.resolve(__dirname, "node_modules/@utoo/web/esm/loaderWorker.js"),
+              from: require.resolve("@utoo/web/esm/loaderWorker.js"),
               to: "loaderWorker.js",
             },
           ],
@@ -82,7 +82,7 @@ const nextConfig: NextConfig = {
         return isServer
           ? "[name].js"
           : `static/chunks/${
-              dev || ["worker", "threadWorker", "serviceWorker", "loaderWorker"].includes(pathData.chunk.name)
+              dev || ["worker", "threadWorker", "serviceWorker"].includes(pathData.chunk.name)
                 ? "[name]"
                 : "[name].[contenthash]"
             }.js`;
