@@ -18,6 +18,7 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
       url: `${location.origin}/_next/static/chunks/serviceWorker.js`,
       scope: serviceWorkerScope,
     },
+    logFilter: new URLSearchParams(location.search).get("logFilter") || "",
   });
 
   onProgress?.(10, "Initializing service worker...");
