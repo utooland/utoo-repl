@@ -153,7 +153,6 @@ export const Editor: React.FC<EditorProps> = ({
                   endWithNewline: false,
                   extraLiners: "head, body, /html",
                   wrapAttributes: "auto",
-                  wrapAttributesIndentSize: null,
                   eol: "\n",
                 },
                 suggest: { html5: true, angular1: true, ionic: true },
