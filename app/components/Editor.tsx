@@ -126,6 +126,39 @@ export const Editor: React.FC<EditorProps> = ({
               automaticLayout: true,
             }}
             beforeMount={(monaco) => {
+              // Disable syntax validation
+              monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+                noSemanticValidation: true,
+                noSyntaxValidation: true,
+              });
+              monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+                noSemanticValidation: true,
+                noSyntaxValidation: true,
+              });
+              monaco.languages.css.cssDefaults.setOptions({ validate: false });
+              monaco.languages.json.jsonDefaults.setDiagnosticsOptions({ validate: false });
+              monaco.languages.html.htmlDefaults.setOptions({
+                validate: false,
+                format: {
+                  tabSize: 2,
+                  insertSpaces: true,
+                  wrapLineLength: 120,
+                  unformatted:
+                    'default": "a, abbr, acronym, b, bdo, big, br, button, cite, code, dfn, em, i, img, input, kbd, label, map, object, q, samp, select, small, span, strong, sub, sup, textarea, tt, var',
+                  contentUnformatted: "pre",
+                  indentInnerHtml: false,
+                  preserveNewLines: true,
+                  maxPreserveNewLines: null,
+                  indentHandlebars: false,
+                  endWithNewline: false,
+                  extraLiners: "head, body, /html",
+                  wrapAttributes: "auto",
+                  wrapAttributesIndentSize: null,
+                  eol: "\n",
+                },
+                suggest: { html5: true, angular1: true, ionic: true },
+              });
+
               // Using Catppuccin Mocha theme
               monaco.editor.defineTheme("catppuccin-mocha", {
                 base: "vs-dark",
