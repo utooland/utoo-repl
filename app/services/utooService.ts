@@ -13,7 +13,7 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
     cwd: projectName,
     workerUrl: `${location.origin}/_next/static/chunks/worker.js`,
     threadWorkerUrl: `${location.origin}/_next/static/chunks/threadWorker.js`,
-    loaderWorkerUrl: `${location.origin}/_next/static/chunks/loaderWorker.js`,
+    loaderWorkerUrl: new URL('@utoo/web/esm/loaderWorker.js', import.meta.url).href,
     serviceWorker: {
       url: `${location.origin}/_next/static/chunks/serviceWorker.js`,
       scope: serviceWorkerScope,

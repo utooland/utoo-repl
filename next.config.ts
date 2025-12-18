@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import CopyPlugin from "copy-webpack-plugin";
-import path from "path";
 
 const nextConfig: NextConfig = {
   headers: async () => {
