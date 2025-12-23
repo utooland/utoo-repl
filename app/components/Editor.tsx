@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback, useEffect } from "react";
 import MonacoEditor from "@monaco-editor/react";
+import { type FC, useCallback, useEffect, useMemo } from "react";
 
 interface EditorProps {
   openFiles: string[];
@@ -28,7 +28,7 @@ const getLanguage = (filename: string): string => {
   return LANGUAGE_MAP[ext] || "plaintext";
 };
 
-export const Editor: React.FC<EditorProps> = ({
+export const Editor: FC<EditorProps> = ({
   openFiles,
   activeFile,
   content,
@@ -39,7 +39,11 @@ export const Editor: React.FC<EditorProps> = ({
   onCloseFile,
   onSave,
 }) => {
-  const modelUri = useMemo(() => (activeFile ? `file:///${activeFile.replace(/^\.\//, "")}` : undefined), [activeFile]);
+  const modelUri = useMemo(
+    () =>
+      activeFile ? `file:///${activeFile.replace(/^\.\//, "")}` : undefined,
+    [activeFile],
+  );
   const language = useMemo(() => getLanguage(activeFile), [activeFile]);
   const hasOpenFiles = openFiles.length > 0;
 
@@ -50,7 +54,7 @@ export const Editor: React.FC<EditorProps> = ({
         onSave();
       }
     },
-    [isDirty, onSave]
+    [isDirty, onSave],
   );
 
   useEffect(() => {
@@ -61,7 +65,10 @@ export const Editor: React.FC<EditorProps> = ({
   return (
     <div className="h-full flex flex-col">
       {hasOpenFiles && (
-        <div className="flex items-center gap-1 px-2 py-1 bg-card/10 border-b border-border/20 overflow-x-auto flex-shrink-0">
+        <div
+          role="tablist"
+          className="flex items-center gap-1 px-2 py-1 bg-card/10 border-b border-border/20 overflow-x-auto flex-shrink-0"
+        >
           {openFiles.map((file) => {
             const name = file.split("/").pop() || file;
             const isActive = file === activeFile;
@@ -69,22 +76,34 @@ export const Editor: React.FC<EditorProps> = ({
             return (
               <div
                 key={file}
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={0}
                 onClick={() => onSwitchFile(file)}
-                className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer text-sm whitespace-nowrap transition-all select-none ${
-                  isActive ? "bg-purple-600/30 text-white shadow-lg" : "text-slate-300 hover:bg-slate-700/30"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSwitchFile(file);
+                  }
+                }}
+                className={`flex items-center gap-2 px-3 py-1 rounded-md cursor-pointer text-sm whitespace-nowrap transition-all select-none focus:outline-none focus:ring-1 focus:ring-purple-500/50 ${
+                  isActive
+                    ? "bg-purple-600/30 text-white shadow-lg"
+                    : "text-slate-300 hover:bg-slate-700/30"
                 }`}
                 title={file}
               >
                 <span className="truncate max-w-[150px]">{name}</span>
                 {isDirtyForFile && (
                   <span
-                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"
-                  }`}
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      isSaving ? "bg-blue-400 animate-pulse" : "bg-orange-400"
+                    }`}
                     title={isSaving ? "Saving..." : "Unsaved changes"}
                   />
                 )}
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onCloseFile(file);
@@ -127,16 +146,22 @@ export const Editor: React.FC<EditorProps> = ({
             }}
             beforeMount={(monaco) => {
               // Disable syntax validation
-              monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-                noSemanticValidation: true,
-                noSyntaxValidation: true,
-              });
-              monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-                noSemanticValidation: true,
-                noSyntaxValidation: true,
-              });
+              monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions(
+                {
+                  noSemanticValidation: true,
+                  noSyntaxValidation: true,
+                },
+              );
+              monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions(
+                {
+                  noSemanticValidation: true,
+                  noSyntaxValidation: true,
+                },
+              );
               monaco.languages.css.cssDefaults.setOptions({ validate: false });
-              monaco.languages.json.jsonDefaults.setDiagnosticsOptions({ validate: false });
+              monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+                validate: false,
+              });
               monaco.languages.html.htmlDefaults.setOptions({
                 format: {
                   tabSize: 2,
@@ -161,7 +186,11 @@ export const Editor: React.FC<EditorProps> = ({
                 base: "vs-dark",
                 inherit: true,
                 rules: [
-                  { token: "comment", foreground: "a6adc8", fontStyle: "italic" },
+                  {
+                    token: "comment",
+                    foreground: "a6adc8",
+                    fontStyle: "italic",
+                  },
                   { token: "string", foreground: "a6e3a1" },
                   { token: "number", foreground: "f9e2af" },
                   { token: "keyword", foreground: "cba6f7" },
@@ -193,7 +222,7 @@ export const Editor: React.FC<EditorProps> = ({
                 },
               });
             }}
-            onMount={(editor, monaco) => {
+            onMount={(_, monaco) => {
               monaco.editor.setTheme("catppuccin-mocha");
             }}
           />
@@ -203,8 +232,12 @@ export const Editor: React.FC<EditorProps> = ({
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="text-6xl opacity-40">📄</div>
             <div>
-              <h3 className="text-lg font-semibold text-slate-300 mb-2">No files open</h3>
-              <p className="text-sm text-slate-400">Select a file from the project tree to start editing</p>
+              <h3 className="text-lg font-semibold text-slate-300 mb-2">
+                No files open
+              </h3>
+              <p className="text-sm text-slate-400">
+                Select a file from the project tree to start editing
+              </p>
             </div>
           </div>
         </div>

@@ -1,7 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
-import { ChevronRight, Folder, File, RefreshCw, FolderOpen, FilePlus, FolderPlus } from "lucide-react";
+import {
+  ChevronRight,
+  File,
+  FilePlus,
+  Folder,
+  FolderOpen,
+  FolderPlus,
+  RefreshCw,
+} from "lucide-react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { FileTreeItemProps } from "../types";
+import type { FileTreeItemProps } from "../types";
 
 const InlineInput: React.FC<{
   type: "file" | "folder";
@@ -72,7 +81,8 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
 
   const isSelected = selectedFile && selectedFile === item.fullName;
   const depth = item.fullName.split("/").length;
-  const shouldShowInput = creatingItem?.parentPath === item.fullName && item.type === "directory";
+  const shouldShowInput =
+    creatingItem?.parentPath === item.fullName && item.type === "directory";
   const isRoot = item.fullName === ".";
 
   const handleToggleExpand = (e: React.MouseEvent) => {
@@ -108,28 +118,56 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
     if (shouldShowInput && !isExpanded) {
       setIsExpanded(true);
     }
-  }, [shouldShowInput]);
+  }, [shouldShowInput, isExpanded]);
 
   useEffect(() => {
     if (item.type === "directory" && selectedFile) {
-      const isParent = item.fullName !== "." && selectedFile.startsWith(item.fullName + "/");
+      const isParent =
+        item.fullName !== "." && selectedFile.startsWith(`${item.fullName}/`);
       if (isParent && !isExpanded) {
         setIsExpanded(true);
         onDirectoryExpand?.(item);
       }
     }
-  }, [selectedFile, item.fullName, item.type, onDirectoryExpand]);
+  }, [selectedFile, item.fullName, onDirectoryExpand, isExpanded, item]);
 
   return (
-    <li className="flex flex-col text-sm w-full">
+    <li role="none" className="flex flex-col text-sm w-full">
       <div
+        role="treeitem"
+        aria-selected={isSelected}
+        aria-expanded={item.type === "directory" ? isExpanded : undefined}
+        tabIndex={0}
         className={cn(
-          "flex items-center py-1.5 px-2 rounded-md cursor-pointer transition-colors duration-150 w-full min-h-[2.25rem] select-none",
-          isSelected ? "bg-purple-500/20 text-white" : "text-slate-300 hover:bg-slate-700/50",
+          "flex items-center py-1.5 px-2 rounded-md cursor-pointer transition-colors duration-150 w-full min-h-[2.25rem] select-none focus:outline-none focus:ring-1 focus:ring-purple-500/50",
+          isSelected
+            ? "bg-purple-500/20 text-white"
+            : "text-slate-300 hover:bg-slate-700/50",
           isRoot &&
-            "sticky top-0 z-20 bg-gradient-to-r from-slate-800/95 to-slate-900/95 backdrop-blur-md border-b border-purple-500/30 shadow-lg"
+            "sticky top-0 z-20 bg-gradient-to-r from-slate-800/95 to-slate-900/95 backdrop-blur-md border-b border-purple-500/30 shadow-lg",
         )}
         onClick={handleItemClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleItemClick();
+          } else if (
+            e.key === "ArrowRight" &&
+            item.type === "directory" &&
+            !isExpanded
+          ) {
+            e.preventDefault();
+            setIsExpanded(true);
+            onDirectoryExpand?.(item);
+          } else if (
+            e.key === "ArrowLeft" &&
+            item.type === "directory" &&
+            isExpanded
+          ) {
+            e.preventDefault();
+            setIsExpanded(false);
+          }
+        }}
         onContextMenu={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -142,7 +180,7 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
             <ChevronRight
               className={cn(
                 "w-4 h-4 flex-shrink-0 transform transition-transform duration-150",
-                isExpanded && "rotate-90"
+                isExpanded && "rotate-90",
               )}
               onClick={handleToggleExpand}
             />
@@ -154,12 +192,14 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
         </div>
         {item.type === "directory" && onDirectoryExpand && (
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onDirectoryExpand(item);
             }}
             className="p-1 rounded-md hover:bg-slate-600 transition-colors flex-shrink-0"
             title="Refresh directory"
+            aria-label={`Refresh ${item.name}`}
           >
             <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
           </button>
@@ -177,20 +217,19 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
               />
             </li>
           )}
-          {item.children &&
-            item.children.map((child) => (
-              <FileTreeItem
-                key={child.fullName}
-                item={child}
-                onFileClick={onFileClick}
-                onDirectoryExpand={onDirectoryExpand}
-                selectedFile={selectedFile}
-                onContextMenu={onContextMenu}
-                creatingItem={creatingItem}
-                onCreateConfirm={onCreateConfirm}
-                onCreateCancel={onCreateCancel}
-              />
-            ))}
+          {item.children?.map((child) => (
+            <FileTreeItem
+              key={child.fullName}
+              item={child}
+              onFileClick={onFileClick}
+              onDirectoryExpand={onDirectoryExpand}
+              selectedFile={selectedFile}
+              onContextMenu={onContextMenu}
+              creatingItem={creatingItem}
+              onCreateConfirm={onCreateConfirm}
+              onCreateCancel={onCreateCancel}
+            />
+          ))}
         </ul>
       )}
     </li>

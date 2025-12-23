@@ -1,18 +1,18 @@
-import type React from 'react';
+import type React from "react";
 
 interface TimerProps {
   time: number;
-  format?: 'seconds' | 'milliseconds';
+  format?: "seconds" | "milliseconds";
   style?: React.CSSProperties;
 }
 
 export const Timer: React.FC<TimerProps> = ({
   time,
-  format = 'seconds',
+  format = "seconds",
   style = {},
 }) => {
   const formatTime = (time: number): string => {
-    if (format === 'seconds') {
+    if (format === "seconds") {
       const timeInSeconds = time / 1000;
       if (timeInSeconds < 60) {
         return `${timeInSeconds.toFixed(3)}s`;
@@ -29,9 +29,10 @@ export const Timer: React.FC<TimerProps> = ({
   return (
     <span
       style={{
-        fontFamily: 'var(--font-jetbrains-mono), "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Monaco, monospace',
-        fontSize: '0.875rem',
-        color: '#cbd5e1',
+        fontFamily:
+          'var(--font-jetbrains-mono), "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Monaco, monospace',
+        fontSize: "0.875rem",
+        color: "#cbd5e1",
         fontWeight: 500,
         ...style,
       }}

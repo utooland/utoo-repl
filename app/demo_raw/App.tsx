@@ -1,7 +1,7 @@
 import "./App.less";
 
 import { Flex, Layout } from "antd";
-import React from "react";
+import type React from "react";
 import TailwindExamples from "./TailwindExamples";
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -58,10 +58,18 @@ const App: React.FC = () => (
       <div className="card-title">Button Styles</div>
       <div className="card-content">
         <div className="button-group">
-          <button className="btn btn-primary">Primary Button</button>
-          <button className="btn btn-success">Success Button</button>
-          <button className="btn btn-warning">Warning Button</button>
-          <button className="btn btn-danger">Danger Button</button>
+          <button type="button" className="btn btn-primary">
+            Primary Button
+          </button>
+          <button type="button" className="btn btn-success">
+            Success Button
+          </button>
+          <button type="button" className="btn btn-warning">
+            Warning Button
+          </button>
+          <button type="button" className="btn btn-danger">
+            Danger Button
+          </button>
         </div>
       </div>
     </div>

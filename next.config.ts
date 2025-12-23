@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+    ],
+  },
   headers: async () => {
     return [
       {
@@ -29,7 +37,10 @@ const nextConfig: NextConfig = {
         return isServer
           ? "[name].js"
           : `static/chunks/${
-              dev || ["worker", "threadWorker", "serviceWorker"].includes(pathData.chunk.name)
+              dev ||
+              ["worker", "threadWorker", "serviceWorker"].includes(
+                pathData.chunk.name,
+              )
                 ? "[name]"
                 : "[name].[contenthash]"
             }.js`;

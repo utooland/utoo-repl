@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 interface DialogState {
   isOpen: boolean;
@@ -10,14 +10,19 @@ export const useConfirmDialog = () => {
     isOpen: false,
     title: "",
   });
-  const [resolveDialog, setResolveDialog] = useState<((value: "save" | "dontSave" | null) => void) | null>(null);
+  const [resolveDialog, setResolveDialog] = useState<
+    ((value: "save" | "dontSave" | null) => void) | null
+  >(null);
 
-  const showConfirmDialog = useCallback((title: string): Promise<"save" | "dontSave" | null> => {
-    return new Promise((resolve) => {
-      setResolveDialog(() => resolve);
-      setDialogState({ isOpen: true, title });
-    });
-  }, []);
+  const showConfirmDialog = useCallback(
+    (title: string): Promise<"save" | "dontSave" | null> => {
+      return new Promise((resolve) => {
+        setResolveDialog(() => resolve);
+        setDialogState({ isOpen: true, title });
+      });
+    },
+    [],
+  );
 
   const handleDialogAction = useCallback(
     (action: "save" | "dontSave" | null) => {
@@ -25,7 +30,7 @@ export const useConfirmDialog = () => {
       setDialogState({ isOpen: false, title: "" });
       setResolveDialog(null);
     },
-    [resolveDialog]
+    [resolveDialog],
   );
 
   return {

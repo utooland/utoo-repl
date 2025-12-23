@@ -1,27 +1,42 @@
-import React, { useMemo, useEffect } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { ConfirmDialog } from "./components/ConfirmDialog";
+import { ContextMenu } from "./components/ContextMenu";
 import { Editor } from "./components/Editor";
 import { FileTreeItem } from "./components/FileTree";
 import { Panel } from "./components/Panel";
 import { Preview } from "./components/Preview";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { Timer } from "./components/Timer";
-import { ConfirmDialog } from "./components/ConfirmDialog";
-import { useContextMenu } from "./hooks/useContextMenu";
-import { ContextMenu } from "./components/ContextMenu";
 import { useBuild } from "./hooks/useBuild";
+import { useConfirmDialog } from "./hooks/useConfirmDialog";
+import { useContextMenu } from "./hooks/useContextMenu";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
 import { useUtooProject } from "./hooks/useUtooProject";
-import { useConfirmDialog } from "./hooks/useConfirmDialog";
 import "./styles.css";
 
 const Project = () => {
-  const { dialogState, showConfirmDialog, handleDialogAction } = useConfirmDialog();
+  const { dialogState, showConfirmDialog, handleDialogAction } =
+    useConfirmDialog();
 
-  const { project, isLoading, error: projectError, initProgress, initMessage, initTime } = useUtooProject();
-  const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem } = useFileTree(project);
+  const {
+    project,
+    isLoading,
+    error: projectError,
+    initProgress,
+    initMessage,
+    initTime,
+  } = useUtooProject();
+  const {
+    fileTree,
+    handleDirectoryExpand,
+    createFile,
+    createFolder,
+    deleteItem,
+  } = useFileTree(project);
   const {
     openFiles,
     openFile,
@@ -36,7 +51,21 @@ const Project = () => {
     error: fileContentError,
   } = useFileContent(project, showConfirmDialog);
 
-  const previewRef = React.useRef<{ reload: () => void }>(null);
+  const previewRef = useRef<{ reload: () => void }>(null);
+
+  const handleBuildReload = useCallback(() => {
+    if (previewRef.current) {
+      previewRef.current.reload();
+    }
+  }, []);
+
+  const handleBuildSuccess = useCallback(
+    (url: string) => {
+      // Automatically set the preview URL after build is complete
+      setPreviewUrl(url);
+    },
+    [setPreviewUrl],
+  );
 
   const {
     isBuilding,
@@ -49,15 +78,8 @@ const Project = () => {
     project,
     fileTree,
     handleDirectoryExpand,
-    () => {
-      if (previewRef.current) {
-        previewRef.current.reload();
-      }
-    },
-    (url: string) => {
-      // Automatically set the preview URL after build is complete
-      setPreviewUrl(url);
-    }
+    handleBuildReload,
+    handleBuildSuccess,
   );
 
   const error = projectError || fileContentError || buildError;
@@ -77,21 +99,28 @@ const Project = () => {
     cancelDeleting,
   } = useContextMenu(handleDirectoryExpand);
 
-  const handleCreateConfirm = async (name: string) => {
-    if (!creatingItem) return;
+  const handleCreateConfirm = useCallback(
+    async (name: string) => {
+      if (!creatingItem) return;
 
-    try {
-      const isFile = creatingItem.type === "file";
-      isFile ? await createFile(creatingItem.parentPath, name) : await createFolder(creatingItem.parentPath, name);
-      toast.success(`${isFile ? "文件" : "文件夹"} "${name}" 创建成功`);
-      cancelCreating();
-    } catch (error) {
-      console.error("Error creating item:", error);
-      toast.error(`创建失败: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  };
+      try {
+        const isFile = creatingItem.type === "file";
+        isFile
+          ? await createFile(creatingItem.parentPath, name)
+          : await createFolder(creatingItem.parentPath, name);
+        toast.success(`${isFile ? "文件" : "文件夹"} "${name}" 创建成功`);
+        cancelCreating();
+      } catch (error) {
+        console.error("Error creating item:", error);
+        toast.error(
+          `创建失败: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    },
+    [creatingItem, createFile, createFolder, cancelCreating],
+  );
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!deletingItem) return;
 
     try {
@@ -100,18 +129,21 @@ const Project = () => {
       cancelDeleting();
     } catch (error) {
       console.error("Error deleting item:", error);
-      toast.error(`删除失败: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(
+        `删除失败: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
-  };
+  }, [deletingItem, deleteItem, cancelDeleting]);
 
   useEffect(() => {
     if (deletingItem) {
       handleDeleteConfirm();
     }
-  }, [deletingItem]);
+  }, [deletingItem, handleDeleteConfirm]);
 
   const buildButton = (
     <Button
+      type="button"
       onClick={handleBuild}
       disabled={isBuilding || !project}
       variant="default"
@@ -132,23 +164,39 @@ const Project = () => {
       {/* Main content area */}
       <div className="grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] h-[calc(100vh-3rem)]">
         <Panel title="Project" actions={buildButton}>
-          {error && <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>}
-          {(isLoading || (initProgress !== undefined && initProgress > 0 && initProgress < 100)) && (
+          {error && (
+            <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>
+          )}
+          {(isLoading ||
+            (initProgress !== undefined &&
+              initProgress > 0 &&
+              initProgress < 100)) && (
             <div className="mb-4 px-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">{initMessage || "Initializing project..."}</span>
+                <span className="text-sm text-slate-200 font-medium">
+                  {initMessage || "Initializing project..."}
+                </span>
                 <Timer time={initTime} format="seconds" />
               </div>
-              <Progress value={initProgress || 0} className="h-1.5 bg-secondary/20" />
+              <Progress
+                value={initProgress || 0}
+                className="h-1.5 bg-secondary/20"
+              />
             </div>
           )}
-          {(isBuilding || (buildProgress !== undefined && buildProgress > 0)) && (
+          {(isBuilding ||
+            (buildProgress !== undefined && buildProgress > 0)) && (
             <div className="p-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">{buildMessage || "Building project..."}</span>
+                <span className="text-sm text-slate-200 font-medium">
+                  {buildMessage || "Building project..."}
+                </span>
                 <Timer time={buildTime} format="seconds" />
               </div>
-              <Progress value={buildProgress || 0} className="h-1.5 bg-secondary/20" />
+              <Progress
+                value={buildProgress || 0}
+                className="h-1.5 bg-secondary/20"
+              />
             </div>
           )}
           {!isLoading && !error && (
@@ -158,7 +206,11 @@ const Project = () => {
                   key={item.fullName}
                   item={item}
                   onFileClick={openFile}
-                  onDirectoryExpand={item.type === "directory" ? handleDirectoryExpand : undefined}
+                  onDirectoryExpand={
+                    item.type === "directory"
+                      ? handleDirectoryExpand
+                      : undefined
+                  }
                   selectedFile={selectedFilePath} // Pass the selectedFilePath state here
                   onContextMenu={handleContextMenu}
                   creatingItem={creatingItem}
@@ -178,7 +230,9 @@ const Project = () => {
             onNewFile={handleCreateFile}
             onNewFolder={handleCreateFolder}
             onDelete={handleDelete}
-            selectedItem={contextMenu.item ? { type: contextMenu.item.type } : null}
+            selectedItem={
+              contextMenu.item ? { type: contextMenu.item.type } : null
+            }
           />
         )}
 
@@ -214,10 +268,12 @@ const Project = () => {
 
       <div className="flex items-center justify-between px-6 py-2 bg-card/20 backdrop-blur-sm border-t border-border/30">
         <div className="flex items-center gap-2">
-          <img
+          <Image
             src="https://avatars.githubusercontent.com/u/217533135?s=200&v=4"
             alt="Utoo Logo"
-            className="w-5 h-5 rounded-md shadow-lg"
+            width={20}
+            height={20}
+            className="rounded-md shadow-lg"
           />
           <h1 className="text-md font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             Utoo REPL
