@@ -1,7 +1,6 @@
 // @ts-expect-error
-
-// @ts-expect-error
 import AppLess from "!!raw-loader!./demo_raw/App.less";
+// @ts-expect-error
 import AppTsx from "!!raw-loader!./demo_raw/App.tsx";
 // @ts-expect-error
 import IndexCss from "!!raw-loader!./demo_raw/index.css";

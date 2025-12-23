@@ -8,6 +8,11 @@ type ContextMenuState = {
   item: FileTreeNode | null;
 };
 
+const getParentPath = (item: FileTreeNode): string =>
+  item.type === "directory"
+    ? item.fullName
+    : item.fullName.split("/").slice(0, -1).join("/") || ".";
+
 export const useContextMenu = (
   onDirectoryExpand?: (item: FileTreeNode) => void,
 ) => {
@@ -35,14 +40,6 @@ export const useContextMenu = (
     setContextMenu((prev) => ({ ...prev, visible: false }));
   }, []);
 
-  const getParentPath = useCallback(
-    (item: FileTreeNode): string =>
-      item.type === "directory"
-        ? item.fullName
-        : item.fullName.split("/").slice(0, -1).join("/") || ".",
-    [],
-  );
-
   const handleCreateItem = useCallback(
     (type: "file" | "folder") => {
       const item = contextMenu.item;
@@ -58,7 +55,7 @@ export const useContextMenu = (
         parentType: item.type,
       });
     },
-    [contextMenu.item, onDirectoryExpand, getParentPath],
+    [contextMenu.item, onDirectoryExpand],
   );
 
   const handleDelete = useCallback(() => {
