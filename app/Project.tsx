@@ -200,7 +200,7 @@ const Project = () => {
             </div>
           )}
           {(isBuilding || (buildProgress !== undefined && buildProgress > 0)) && (
-            <div className="mb-4">
+            <div className="p-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-slate-200 font-medium">{buildMessage || "Building project..."}</span>
                 <Timer time={buildTime} format="seconds" />

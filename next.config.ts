@@ -4,36 +4,35 @@ const nextConfig: NextConfig = {
   headers: async () => {
     return [
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
             value: "same-origin",
           },
           {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
+            key: "Cross-Origin-Embedder-Policy",
+            value: "require-corp",
           },
           {
             key: "Service-Worker-Allowed",
-            value: "/"
-          }
+            value: "/",
+          },
         ],
       },
-    ]
+    ];
   },
   webpack: (config, { isServer, dev }) => {
     if (!isServer && !dev) {
       config.optimization.splitChunks = false;
       config.output.chunkFilename = (pathData) => {
         return isServer
-          ? '[name].js'
-          : `static/chunks/${dev || ([
-            "worker",
-            "threadWorker",
-            "serviceWorker"
-          ].includes(pathData.chunk.name)) ? '[name]' : '[name].[contenthash]'
-          }.js`
+          ? "[name].js"
+          : `static/chunks/${
+              dev || ["worker", "threadWorker", "serviceWorker"].includes(pathData.chunk.name)
+                ? "[name]"
+                : "[name].[contenthash]"
+            }.js`;
       };
     }
     return config;
