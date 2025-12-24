@@ -24,7 +24,7 @@ const Project = () => {
 
   const { project, isLoading, error: projectError, initProgress, initMessage, initTime } = useUtooProject();
   const { fileTree, handleDirectoryExpand, createFile, createFolder, deleteItem, refresh: refreshFileTree, clearAll } = useFileTree(project);
-  const { importDirectory, isImporting } = useImportDirectory(project, refreshFileTree);
+  const { importDirectory, isImporting } = useImportDirectory(project);
   const {
     openFiles,
     openFile,
