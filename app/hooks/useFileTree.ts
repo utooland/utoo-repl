@@ -171,50 +171,61 @@ export const useFileTree = (project: UtooProject | null) => {
   );
 
   const deleteItem = useCallback(
-        async (itemPath: string): Promise<void> => {
-            try {
-                if (!project) throw new Error("Project not initialized.");
+    async (itemPath: string): Promise<void> => {
+      try {
+        if (!project) throw new Error("Project not initialized.");
 
-                // TODO: rm has a bug, will support files after fix
-                await project.rmdir(itemPath, { recursive: true });
+        // TODO: rm has a bug, will support files after fix
+        await project.rmdir(itemPath, { recursive: true });
 
-                const parentPath = itemPath.split("/").slice(0, -1).join("/") || ".";
-                const newChildren = await loadDirectoryChildren(project, parentPath);
-                setFileTree((prevTree) => updateTreeWithChildren(prevTree, parentPath, newChildren));
+        const parentPath = itemPath.split("/").slice(0, -1).join("/") || ".";
+        const newChildren = await loadDirectoryChildren(project, parentPath);
+        setFileTree((prevTree) =>
+          updateTreeWithChildren(prevTree, parentPath, newChildren),
+        );
 
-                setExpandedDirs(prev => {
-                    const updated = new Set(prev);
-                    updated.delete(itemPath);
-                    return updated;
-                });
-            } catch (e: unknown) {
-                console.error(`Error deleting folder at path ${itemPath}:`, e);
-                throw e;
-            }
-        },
-        [project, updateTreeWithChildren],
-    );
+        setExpandedDirs((prev) => {
+          const updated = new Set(prev);
+          updated.delete(itemPath);
+          return updated;
+        });
+      } catch (e: unknown) {
+        console.error(`Error deleting folder at path ${itemPath}:`, e);
+        throw e;
+      }
+    },
+    [project, updateTreeWithChildren],
+  );
 
-    const refresh = useCallback(() => {
-        if (project) {
-            buildInitialFileTree(project);
-        }
-    }, [project, buildInitialFileTree]);
+  const refresh = useCallback(() => {
+    if (project) {
+      buildInitialFileTree(project);
+    }
+  }, [project, buildInitialFileTree]);
 
-    const clearAll = useCallback(async () => {
-        if (!project) return;
-        try {
-            const rootItems = await project.readdir(".");
-            for (const item of rootItems) {
-               // Using rmdir for everything based on current workaround
-               await project.rmdir(item.name, { recursive: true });
-            }
-            await refresh();
-        } catch (e) {
-            console.error("Error clearing project:", e);
-            throw e;
-        }
-    }, [project, refresh]);
+  const clearAll = useCallback(async () => {
+    if (!project) return;
+    try {
+      const rootItems = await project.readdir(".");
+      for (const item of rootItems) {
+        // Using rmdir for everything based on current workaround
+        await project.rmdir(item.name, { recursive: true });
+      }
+      await refresh();
+    } catch (e) {
+      console.error("Error clearing project:", e);
+      throw e;
+    }
+  }, [project, refresh]);
 
-    return { fileTree, handleDirectoryExpand, setFileTree, createFile, createFolder, deleteItem, refresh, clearAll };
+  return {
+    fileTree,
+    handleDirectoryExpand,
+    setFileTree,
+    createFile,
+    createFolder,
+    deleteItem,
+    refresh,
+    clearAll,
+  };
 };

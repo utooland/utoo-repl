@@ -1,7 +1,7 @@
 import type { Project as UtooProject } from "@utoo/web";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { serviceWorkerScope } from "../services/utooService";
 import { toast } from "sonner";
+import { serviceWorkerScope } from "../services/utooService";
 
 interface FileState {
   content: string;
@@ -28,7 +28,7 @@ export const useFileContent = (
   project: UtooProject | null,
   onShowConfirm?: (title: string) => Promise<"save" | "dontSave" | null>,
 ): UseFileContentReturn => {
-  const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx", "src/app.tsx"]);
+  const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx"]);
   const [fileStates, setFileStates] = useState<Record<string, FileState>>({});
   const [selectedFilePath, setSelectedFilePath] =
     useState<string>("src/index.tsx");
