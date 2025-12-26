@@ -13,7 +13,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-progress": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
-    "@utoo/web": "1.2.0-rc.11",
+    "@utoo/web": "1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.542.0",
