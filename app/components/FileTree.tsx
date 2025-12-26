@@ -120,17 +120,6 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
     }
   }, [shouldShowInput, isExpanded]);
 
-  useEffect(() => {
-    if (item.type === "directory" && selectedFile) {
-      const isParent =
-        item.fullName !== "." && selectedFile.startsWith(`${item.fullName}/`);
-      if (isParent && !isExpanded) {
-        setIsExpanded(true);
-        onDirectoryExpand?.(item);
-      }
-    }
-  }, [selectedFile, item.fullName, onDirectoryExpand, isExpanded, item]);
-
   return (
     <li role="none" className="flex flex-col text-sm w-full">
       <div

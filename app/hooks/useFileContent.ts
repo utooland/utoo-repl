@@ -28,10 +28,9 @@ export const useFileContent = (
   project: UtooProject | null,
   onShowConfirm?: (title: string) => Promise<"save" | "dontSave" | null>,
 ): UseFileContentReturn => {
-  const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx"]);
+  const [openFiles, setOpenFiles] = useState<string[]>([]);
   const [fileStates, setFileStates] = useState<Record<string, FileState>>({});
-  const [selectedFilePath, setSelectedFilePath] =
-    useState<string>("src/index.tsx");
+  const [selectedFilePath, setSelectedFilePath] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
   const initializingRef = useRef(false);
