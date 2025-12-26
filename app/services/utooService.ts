@@ -24,7 +24,12 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
   await projectInstance.installServiceWorker();
 
   onProgress?.(20, "Creating project files...");
-  await initUtooProject(projectInstance);
+  const hasUtooPack = await projectInstance.readFile('utoopack.json').catch(() => {
+    return false;
+  })
+  if (hasUtooPack === false) {
+    await initUtooProject(projectInstance);
+  }
 
   onProgress?.(30, "Project files created successfully!");
 

@@ -1,6 +1,7 @@
 import type { Project as UtooProject } from "@utoo/web";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { serviceWorkerScope } from "../services/utooService";
+import { toast } from "sonner";
 
 interface FileState {
   content: string;
@@ -27,7 +28,7 @@ export const useFileContent = (
   project: UtooProject | null,
   onShowConfirm?: (title: string) => Promise<"save" | "dontSave" | null>,
 ): UseFileContentReturn => {
-  const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx"]);
+  const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx", "src/app.tsx"]);
   const [fileStates, setFileStates] = useState<Record<string, FileState>>({});
   const [selectedFilePath, setSelectedFilePath] =
     useState<string>("src/index.tsx");
@@ -60,7 +61,7 @@ export const useFileContent = (
         }
       } catch (e: unknown) {
         const errorMessage = e instanceof Error ? e.message : String(e);
-        setError(`Error reading file: ${errorMessage}`);
+        toast.error(`Error reading file: ${errorMessage}`);
       }
     },
     [project, updateFileState],
