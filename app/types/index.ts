@@ -1,5 +1,3 @@
-import { Project as UtooProject } from "@utoo/web";
-
 export interface FileTreeNode {
   name: string;
   fullName: string;

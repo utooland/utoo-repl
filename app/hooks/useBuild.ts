@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
 import type { Project as UtooProject } from "@utoo/web";
+import { useCallback, useState } from "react";
 import type { FileTreeNode } from "../types";
 import { generateHtml } from "../utils/htmlGenerator";
 import { useTimer } from "./useTimer";
@@ -9,13 +9,18 @@ export const useBuild = (
   fileTree: FileTreeNode[],
   handleDirectoryExpand: (root: FileTreeNode) => Promise<void>,
   onBuildComplete: () => void,
-  onPreviewReady?: (url: string) => void
+  onPreviewReady?: (url: string) => void,
 ) => {
   const [isBuilding, setIsBuilding] = useState(false);
   const [error, setError] = useState("");
   const [buildProgress, setBuildProgress] = useState(0);
   const [buildMessage, setBuildMessage] = useState("");
-  const { time: buildTime, start: startBuildTimer, stop: stopBuildTimer, reset: resetBuildTimer } = useTimer();
+  const {
+    time: buildTime,
+    start: startBuildTimer,
+    stop: stopBuildTimer,
+    reset: resetBuildTimer,
+  } = useTimer();
 
   const handleBuild = useCallback(async () => {
     if (!project) return;
@@ -89,7 +94,9 @@ export const useBuild = (
       } catch (e: unknown) {
         console.error("Failed to process stats.json:", e);
         const errorMessage = e instanceof Error ? e.message : String(e);
-        setError(`Build succeeded, but failed to display stats: ${errorMessage}`);
+        setError(
+          `Build succeeded, but failed to display stats: ${errorMessage}`,
+        );
       }
     } catch (e: unknown) {
       console.error("Build failed: ", e);
@@ -100,7 +107,23 @@ export const useBuild = (
       setIsBuilding(false);
       // Keep the progress bar displayed, do not reset
     }
-  }, [project, fileTree, handleDirectoryExpand, onBuildComplete, onPreviewReady, startBuildTimer, stopBuildTimer, resetBuildTimer]);
+  }, [
+    project,
+    fileTree,
+    handleDirectoryExpand,
+    onBuildComplete,
+    onPreviewReady,
+    startBuildTimer,
+    stopBuildTimer,
+    resetBuildTimer,
+  ]);
 
-  return { isBuilding, handleBuild, error, buildProgress, buildMessage, buildTime };
+  return {
+    isBuilding,
+    handleBuild,
+    error,
+    buildProgress,
+    buildMessage,
+    buildTime,
+  };
 };

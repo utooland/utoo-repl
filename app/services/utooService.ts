@@ -4,16 +4,15 @@ import { demoFiles } from "../demoFiles";
 const projectName = "/utooweb-demo";
 export const serviceWorkerScope = "/preview";
 
-export interface ProgressCallback {
-  (progress: number, message: string): void;
-}
+export type ProgressCallback = (progress: number, message: string) => void;
 
 export const initializeProject = async (onProgress?: ProgressCallback) => {
   const projectInstance = new UtooProject({
     cwd: projectName,
     workerUrl: `${location.origin}/_next/static/chunks/worker.js`,
     threadWorkerUrl: `${location.origin}/_next/static/chunks/threadWorker.js`,
-    loaderWorkerUrl: new URL('@utoo/web/esm/loaderWorker.js', import.meta.url).href,
+    loaderWorkerUrl: new URL("@utoo/web/esm/loaderWorker.js", import.meta.url)
+      .href,
     serviceWorker: {
       url: `${location.origin}/_next/static/chunks/serviceWorker.js`,
       scope: serviceWorkerScope,
@@ -25,9 +24,11 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
   await projectInstance.installServiceWorker();
 
   onProgress?.(20, "Creating project files...");
-  const hasUtooPack = await projectInstance.readFile('utoopack.json').catch(() => {
-    return false;
-  })
+  const hasUtooPack = await projectInstance
+    .readFile("utoopack.json")
+    .catch(() => {
+      return false;
+    });
   if (hasUtooPack === false) {
     await initUtooProject(projectInstance);
   }
@@ -37,8 +38,15 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
   return projectInstance;
 };
 
-export const installDependencies = async (project: UtooProject, onProgress?: ProgressCallback): Promise<void> => {
-  console.log("%cOPFS Project:%c Start to install dependencies.", "color: blue;", "color: green");
+export const installDependencies = async (
+  project: UtooProject,
+  onProgress?: ProgressCallback,
+): Promise<void> => {
+  console.log(
+    "%cOPFS Project:%c Start to install dependencies.",
+    "color: blue;",
+    "color: green",
+  );
   const start = performance.now();
 
   // Simulate installation progress
@@ -70,7 +78,7 @@ export const installDependencies = async (project: UtooProject, onProgress?: Pro
   console.log(
     `%cOPFS Project:%c Finished to install dependencies in ${Math.round(performance.now() - start)} ms.`,
     "color: blue;",
-    "color: green"
+    "color: green",
   );
 };
 

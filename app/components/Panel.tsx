@@ -1,5 +1,5 @@
-import type React from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import type React from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 interface PanelProps {
   title: React.ReactNode;
@@ -9,9 +9,15 @@ interface PanelProps {
   contentStyle?: React.CSSProperties;
 }
 
-export const Panel: React.FC<PanelProps> = ({ title, children, actions, style, contentStyle }) => {
+export const Panel: React.FC<PanelProps> = ({
+  title,
+  children,
+  actions,
+  style,
+  contentStyle,
+}) => {
   return (
-    <Card 
+    <Card
       className="flex flex-col bg-card/80 backdrop-blur-sm border-border/50 rounded-none h-[calc(100vh-3rem)]"
       style={style}
     >
@@ -21,10 +27,7 @@ export const Panel: React.FC<PanelProps> = ({ title, children, actions, style, c
         </h3>
         {actions && <div>{actions}</div>}
       </CardHeader>
-      <CardContent 
-        className="flex-1 overflow-auto p-0"
-        style={contentStyle}
-      >
+      <CardContent className="flex-1 overflow-auto p-0" style={contentStyle}>
         {children}
       </CardContent>
     </Card>

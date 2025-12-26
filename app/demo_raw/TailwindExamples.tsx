@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 const TailwindExamples: React.FC = () => {
   return (
@@ -19,10 +19,16 @@ const TailwindExamples: React.FC = () => {
             </span>
           </div>
           <div className="mt-4 flex gap-4">
-            <button className="px-6 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all shadow-lg shadow-cyan-500/50">
+            <button
+              type="button"
+              className="px-6 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all shadow-lg shadow-cyan-500/50"
+            >
               Gradient Button
             </button>
-            <button className="btn-primary-t animate-in fade-in zoom-in duration-1000 border-0">
+            <button
+              type="button"
+              className="btn-primary-t animate-in fade-in zoom-in duration-1000 border-0"
+            >
               @apply Button (Animated)
             </button>
           </div>
@@ -126,10 +132,12 @@ const TailwindExamples: React.FC = () => {
         <div className="p-6 bg-white rounded-xl shadow-lg">
           <h3 className="text-lg font-semibold mb-2">@apply Directive</h3>
           <p className="text-slate-500 mb-4">
-            The button below uses a custom class <code>.btn-primary-t</code> defined in CSS
-            using <code>@apply</code>.
+            The button below uses a custom class <code>.btn-primary-t</code>{" "}
+            defined in CSS using <code>@apply</code>.
           </p>
-          <button className="btn-primary-t">Click me</button>
+          <button type="button" className="btn-primary-t">
+            Click me
+          </button>
         </div>
       </section>
     </div>

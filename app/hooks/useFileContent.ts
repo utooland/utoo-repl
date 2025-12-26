@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { Project as UtooProject } from "@utoo/web";
-import { serviceWorkerScope } from "../services/utooService";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { serviceWorkerScope } from "../services/utooService";
 
 interface FileState {
   content: string;
@@ -26,21 +26,24 @@ interface UseFileContentReturn {
 
 export const useFileContent = (
   project: UtooProject | null,
-  onShowConfirm?: (title: string) => Promise<"save" | "dontSave" | null>
+  onShowConfirm?: (title: string) => Promise<"save" | "dontSave" | null>,
 ): UseFileContentReturn => {
-  const [openFiles, setOpenFiles] = useState<string[]>(["src/index.tsx", "src/app.tsx"]);
+  const [openFiles, setOpenFiles] = useState<string[]>([]);
   const [fileStates, setFileStates] = useState<Record<string, FileState>>({});
-  const [selectedFilePath, setSelectedFilePath] = useState<string>("src/index.tsx");
+  const [selectedFilePath, setSelectedFilePath] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
   const initializingRef = useRef(false);
 
-  const updateFileState = useCallback((filePath: string, updates: Partial<FileState>) => {
-    setFileStates((prev) => ({
-      ...prev,
-      [filePath]: { ...prev[filePath], ...updates },
-    }));
-  }, []);
+  const updateFileState = useCallback(
+    (filePath: string, updates: Partial<FileState>) => {
+      setFileStates((prev) => ({
+        ...prev,
+        [filePath]: { ...prev[filePath], ...updates },
+      }));
+    },
+    [],
+  );
 
   const readAndOpenFile = useCallback(
     async (filePath: string) => {
@@ -49,7 +52,9 @@ export const useFileContent = (
         const content = await project.readFile(filePath, "utf8");
         updateFileState(filePath, { content, isDirty: false, isSaving: false });
         setSelectedFilePath(filePath);
-        setOpenFiles((prev) => (prev.includes(filePath) ? prev : [...prev, filePath]));
+        setOpenFiles((prev) =>
+          prev.includes(filePath) ? prev : [...prev, filePath],
+        );
         if (filePath.endsWith("dist/index.html")) {
           setPreviewUrl(`${location.origin}${serviceWorkerScope}/${filePath}`);
         }
@@ -58,7 +63,7 @@ export const useFileContent = (
         toast.error(`Error reading file: ${errorMessage}`);
       }
     },
-    [project, updateFileState]
+    [project, updateFileState],
   );
 
   const openFile = useCallback(
@@ -67,10 +72,12 @@ export const useFileContent = (
         await readAndOpenFile(filePath);
       } else {
         setSelectedFilePath(filePath);
-        setOpenFiles((prev) => (prev.includes(filePath) ? prev : [...prev, filePath]));
+        setOpenFiles((prev) =>
+          prev.includes(filePath) ? prev : [...prev, filePath],
+        );
       }
     },
-    [fileStates, readAndOpenFile]
+    [fileStates, readAndOpenFile],
   );
 
   const closeFile = useCallback(
@@ -88,7 +95,9 @@ export const useFileContent = (
             await project?.writeFile(filePath, fileStates[filePath].content);
             updateFileState(filePath, { isDirty: false, isSaving: false });
           } catch (e: unknown) {
-            setError(`Error saving file: ${e instanceof Error ? e.message : String(e)}`);
+            setError(
+              `Error saving file: ${e instanceof Error ? e.message : String(e)}`,
+            );
             updateFileState(filePath, { isSaving: false });
             return;
           }
@@ -97,7 +106,11 @@ export const useFileContent = (
 
       const remainingFiles = openFiles.filter((p) => p !== filePath);
       if (selectedFilePath === filePath) {
-        setSelectedFilePath(remainingFiles.length > 0 ? remainingFiles[remainingFiles.length - 1] : "");
+        setSelectedFilePath(
+          remainingFiles.length > 0
+            ? remainingFiles[remainingFiles.length - 1]
+            : "",
+        );
       }
       setOpenFiles(remainingFiles);
       setFileStates((prev) => {
@@ -105,7 +118,14 @@ export const useFileContent = (
         return rest;
       });
     },
-    [openFiles, fileStates, selectedFilePath, onShowConfirm, project, updateFileState]
+    [
+      openFiles,
+      fileStates,
+      selectedFilePath,
+      onShowConfirm,
+      project,
+      updateFileState,
+    ],
   );
 
   const setSelectedFileContent = useCallback(
@@ -113,7 +133,7 @@ export const useFileContent = (
       if (!selectedFilePath) return;
       updateFileState(selectedFilePath, { content, isDirty: true });
     },
-    [selectedFilePath, updateFileState]
+    [selectedFilePath, updateFileState],
   );
 
   const manualSaveFile = useCallback(async () => {
@@ -127,7 +147,9 @@ export const useFileContent = (
       await project.writeFile(selectedFilePath, fileState.content);
       updateFileState(selectedFilePath, { isDirty: false, isSaving: false });
     } catch (e: unknown) {
-      setError(`Error saving file: ${e instanceof Error ? e.message : String(e)}`);
+      setError(
+        `Error saving file: ${e instanceof Error ? e.message : String(e)}`,
+      );
       updateFileState(selectedFilePath, { isSaving: false });
     }
   }, [selectedFilePath, project, fileStates, updateFileState]);
@@ -141,11 +163,16 @@ export const useFileContent = (
         readAndOpenFile(p);
       }
     });
-  }, [project]);
+  }, [project, readAndOpenFile, openFiles, fileStates]);
 
   const currentFile = useMemo(
-    () => fileStates[selectedFilePath] ?? { content: "", isDirty: false, isSaving: false },
-    [fileStates, selectedFilePath]
+    () =>
+      fileStates[selectedFilePath] ?? {
+        content: "",
+        isDirty: false,
+        isSaving: false,
+      },
+    [fileStates, selectedFilePath],
   );
 
   return {
@@ -154,7 +181,10 @@ export const useFileContent = (
     closeFile,
     selectedFilePath,
     selectedFileContent: currentFile.content,
-    fileState: { isDirty: currentFile.isDirty, isSaving: currentFile.isSaving ?? false },
+    fileState: {
+      isDirty: currentFile.isDirty,
+      isSaving: currentFile.isSaving ?? false,
+    },
     setSelectedFileContent,
     manualSaveFile,
     previewUrl,
