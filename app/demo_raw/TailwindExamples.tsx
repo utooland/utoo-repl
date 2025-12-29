@@ -1,6 +1,6 @@
-import type React from "react";
+import React, { type FC } from "react";
 
-const TailwindExamples: React.FC = () => {
+const TailwindExamples: FC = () => {
   return (
     <div className="p-8 bg-slate-50 min-h-screen space-y-12">
       <section className="space-y-4">

@@ -1,5 +1,8 @@
 import MonacoEditor from "@monaco-editor/react";
+import type { Project as UtooProject } from "@utoo/web";
 import { type FC, useCallback, useEffect, useMemo } from "react";
+import { useMonacoTypeSync } from "../hooks/useMonacoTypeSync";
+import { wireFileNavigation } from "../utils/monacoNavigation";
 
 interface EditorProps {
   openFiles: string[];
@@ -11,6 +14,7 @@ interface EditorProps {
   onSwitchFile: (filePath: string) => void;
   onCloseFile: (filePath: string) => void;
   onSave?: () => Promise<void>;
+  project: UtooProject;
 }
 
 const LANGUAGE_MAP: Record<string, string> = {
@@ -20,6 +24,7 @@ const LANGUAGE_MAP: Record<string, string> = {
   js: "typescript",
   json: "json",
   css: "css",
+  less: "less",
   html: "html",
 };
 
@@ -38,6 +43,7 @@ export const Editor: FC<EditorProps> = ({
   onSwitchFile,
   onCloseFile,
   onSave,
+  project,
 }) => {
   const modelUri = useMemo(
     () =>
@@ -46,6 +52,8 @@ export const Editor: FC<EditorProps> = ({
   );
   const language = useMemo(() => getLanguage(activeFile), [activeFile]);
   const hasOpenFiles = openFiles.length > 0;
+
+  const { syncTypes } = useMonacoTypeSync(project, activeFile);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -145,22 +153,54 @@ export const Editor: FC<EditorProps> = ({
               automaticLayout: true,
             }}
             beforeMount={(monaco) => {
-              // Disable syntax validation
+              const compilerOptions = {
+                target: monaco.languages.typescript.ScriptTarget.ESNext,
+                allowNonTsExtensions: true,
+                moduleResolution:
+                  monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+                module: monaco.languages.typescript.ModuleKind.ESNext,
+                noEmit: true,
+                jsx: monaco.languages.typescript.JsxEmit.React,
+                allowJs: true,
+                reactNamespace: "React",
+                esModuleInterop: true,
+                allowSyntheticDefaultImports: true,
+                baseUrl: "file:///",
+                paths: {
+                  "*": ["*", "node_modules/*"],
+                },
+                typeRoots: ["node_modules/@types"],
+                skipLibCheck: true,
+                skipDefaultLibCheck: true,
+              };
+              monaco.languages.typescript.typescriptDefaults.setCompilerOptions(
+                compilerOptions,
+              );
+              monaco.languages.typescript.javascriptDefaults.setCompilerOptions(
+                compilerOptions,
+              );
+              monaco.languages.typescript.typescriptDefaults.setEagerModelSync(
+                true,
+              );
+              monaco.languages.typescript.javascriptDefaults.setEagerModelSync(
+                true,
+              );
               monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions(
                 {
-                  noSemanticValidation: true,
-                  noSyntaxValidation: true,
+                  noSemanticValidation: false,
+                  noSyntaxValidation: false,
                 },
               );
               monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions(
                 {
-                  noSemanticValidation: true,
-                  noSyntaxValidation: true,
+                  noSemanticValidation: false,
+                  noSyntaxValidation: false,
                 },
               );
-              monaco.languages.css.cssDefaults.setOptions({ validate: false });
+              monaco.languages.css.cssDefaults.setOptions({ validate: true });
+              monaco.languages.css.lessDefaults.setOptions({ validate: true });
               monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-                validate: false,
+                validate: true,
               });
               monaco.languages.html.htmlDefaults.setOptions({
                 format: {
@@ -222,8 +262,16 @@ export const Editor: FC<EditorProps> = ({
                 },
               });
             }}
-            onMount={(_, monaco) => {
+            onMount={(editor, monaco) => {
               monaco.editor.setTheme("catppuccin-mocha");
+              syncTypes(monaco);
+
+              const disposeNavigation = wireFileNavigation(
+                editor,
+                monaco,
+                onSwitchFile,
+              );
+              editor.onDidDispose(() => disposeNavigation());
             }}
           />
         </div>
