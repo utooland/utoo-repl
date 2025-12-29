@@ -124,7 +124,7 @@ export const useMonacoTypeSync = (project: UtooProject, activeFile: string) => {
                         newPackageJsonMappings[pkg.name] =
                           `${dir}/${cleanTypes}`;
                       }
-                    } catch (e) {}
+                    } catch (_) {}
                   } else if (!isInNodeModules && /\.(ts|tsx)$/.test(name)) {
                     localFilePaths.push(path);
                   }
@@ -154,7 +154,7 @@ export const useMonacoTypeSync = (project: UtooProject, activeFile: string) => {
                   } else {
                     localFilesMapRef.current.set(path, content);
                   }
-                } catch (e) {}
+                } catch (_) {}
               }),
             );
             await new Promise((resolve) => setTimeout(resolve, 0));
@@ -225,7 +225,7 @@ export const useMonacoTypeSync = (project: UtooProject, activeFile: string) => {
 
         const duration = Math.round(performance.now() - start);
         console.log(`[Editor] Synchronization finished in ${duration}ms`);
-      } catch (e) {
+      } catch (_) {
       } finally {
         isSyncingRef.current = false;
       }

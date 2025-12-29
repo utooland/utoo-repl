@@ -2,6 +2,7 @@ import MonacoEditor from "@monaco-editor/react";
 import type { Project as UtooProject } from "@utoo/web";
 import { type FC, useCallback, useEffect, useMemo } from "react";
 import { useMonacoTypeSync } from "../hooks/useMonacoTypeSync";
+import { wireFileNavigation } from "../utils/monacoNavigation";
 
 interface EditorProps {
   openFiles: string[];
@@ -265,21 +266,12 @@ export const Editor: FC<EditorProps> = ({
               monaco.editor.setTheme("catppuccin-mocha");
               syncTypes(monaco);
 
-              const editorService = (editor as any)._codeEditorService;
-              const openEditorBase =
-                editorService.openCodeEditor.bind(editorService);
-              editorService.openCodeEditor = async (
-                input: any,
-                source: any,
-              ) => {
-                const result = await openEditorBase(input, source);
-                if (input.resource && input.resource.scheme === "file") {
-                  const path = input.resource.path;
-                  const cleanPath = path.replace(/^\/+/, "");
-                  onSwitchFile(cleanPath);
-                }
-                return result;
-              };
+              const disposeNavigation = wireFileNavigation(
+                editor,
+                monaco,
+                onSwitchFile,
+              );
+              editor.onDidDispose(() => disposeNavigation());
             }}
           />
         </div>
