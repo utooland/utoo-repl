@@ -308,6 +308,7 @@ const Project = () => {
             onSwitchFile={openFile}
             onCloseFile={closeFile}
             onSave={manualSaveFile}
+            project={project}
           />
         </Panel>
 

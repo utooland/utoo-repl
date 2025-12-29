@@ -1,12 +1,12 @@
 import "./App.less";
 
 import { Flex, Layout } from "antd";
-import type React from "react";
+import React, { type FC } from "react";
 import TailwindExamples from "./TailwindExamples";
 
 const { Header, Footer, Sider, Content } = Layout;
 
-const App: React.FC = () => (
+const App: FC = () => (
   <div className="container">
     <div className="card">
       <div className="card-title">Layout Demo</div>
