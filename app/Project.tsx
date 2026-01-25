@@ -212,10 +212,10 @@ const Project = () => {
       disabled={isBuilding || isDevMode || !project}
       variant="outline"
       size="sm"
-      className="tech-border-neon bg-purple-500/5 text-purple-400 border-purple-500/30 hover:bg-purple-500/15 transition-all duration-300 font-mono text-[10px] uppercase tracking-wider h-7 min-w-[72px] px-2"
+      title={isBuilding ? "Building..." : "Build with Production"}
+      className="tech-border-neon bg-purple-500/5 text-purple-400 border-purple-500/30 hover:bg-purple-500/15 transition-all duration-300 h-7 w-7 p-0 flex-shrink-0"
     >
-      <Play className="w-3 h-3 mr-1 opacity-80 fill-purple-400 flex-shrink-0" />
-      <span className="truncate">{isBuilding ? "Compiling" : "Build"}</span>
+      <Play className={cn("w-3.5 h-3.5 opacity-80 fill-purple-400", isBuilding && "animate-pulse")} />
     </Button>
   );
 
@@ -226,17 +226,17 @@ const Project = () => {
       disabled={isBuilding || !project}
       variant={isDevMode ? "destructive" : "outline"}
       size="sm"
+      title={isDevMode ? "Stop Development" : "Dev with HMR"}
       className={
         cn(
-          "font-mono text-[10px] uppercase tracking-wider h-7 min-w-[72px] px-2 transition-all duration-300",
+          "h-7 w-7 p-0 transition-all duration-300 flex-shrink-0",
           isDevMode
             ? "bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30 shadow-[0_0_15px_-3px_rgba(239,68,68,0.3)]"
             : "border-cyan-500/30 bg-cyan-400/5 text-cyan-400 hover:bg-cyan-400/15"
         )
       }
     >
-      <Zap className={cn("w-3 h-3 mr-1 flex-shrink-0", isDevMode ? "fill-red-400" : "fill-cyan-400")} />
-      {isDevMode ? "Stop" : "Dev"}
+      <Zap className={cn("w-3.5 h-3.5", isDevMode ? "fill-red-400" : "fill-cyan-400")} />
     </Button>
   );
 
@@ -284,14 +284,14 @@ const Project = () => {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 grid grid-cols-[minmax(280px,0.8fr)_minmax(400px,2fr)_minmax(320px,1.2fr)] relative z-10">
+      <div className="flex-1 grid grid-cols-[minmax(320px,0.8fr)_minmax(400px,2fr)_minmax(320px,1.2fr)] relative z-10">
         <Panel
           title="Explorer"
           actions={
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 flex-shrink-0 ml-2">
               {clearButton}
               {importButton}
-              <div className="w-[1px] h-4 bg-white/10 mx-1" />
+              <div className="w-[1px] h-3 bg-white/10 mx-0.5 flex-shrink-0" />
               {buildButton}
               {devButton}
             </div>

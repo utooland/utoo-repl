@@ -38,14 +38,14 @@ export const Panel: React.FC<PanelProps> = ({
       <div className="corner-bl opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="corner-br opacity-0 group-hover:opacity-100 transition-opacity" />
       
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 h-10 py-1 px-4 border-b border-white/5 bg-white/5 backdrop-blur-md relative z-10">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-3 bg-purple-500 rounded-full" />
-          <h3 className="text-[11px] font-bold text-slate-300 uppercase tracking-[0.2em] select-none">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 h-10 py-1 px-4 border-b border-white/5 bg-white/5 backdrop-blur-md relative z-10 gap-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className="w-1 h-3 bg-purple-500 rounded-full flex-shrink-0" />
+          <h3 className="text-[11px] font-bold text-slate-300 uppercase tracking-[0.2em] select-none truncate">
             {title}
           </h3>
         </div>
-        {actions && <div className="flex items-center gap-1">{actions}</div>}
+        {actions && <div className="flex items-center gap-1 flex-shrink-0">{actions}</div>}
       </CardHeader>
       <CardContent className="flex-1 overflow-auto p-0 scrollbar-hide bg-cyber-grid" style={contentStyle}>
         {children}
