@@ -221,49 +221,52 @@ export const Editor: FC<EditorProps> = ({
                 suggest: { html5: true, angular1: true, ionic: true },
               });
 
-              // Using Catppuccin Mocha theme
-              monaco.editor.defineTheme("catppuccin-mocha", {
+              // Using a refined Cyberpunk-inspired Dark theme
+              monaco.editor.defineTheme("modern-dark", {
                 base: "vs-dark",
                 inherit: true,
                 rules: [
-                  {
-                    token: "comment",
-                    foreground: "a6adc8",
-                    fontStyle: "italic",
-                  },
-                  { token: "string", foreground: "a6e3a1" },
-                  { token: "number", foreground: "f9e2af" },
-                  { token: "keyword", foreground: "cba6f7" },
+                  { token: "comment", foreground: "64748b", fontStyle: "italic" },
+                  { token: "string", foreground: "4ade80" },
+                  { token: "number", foreground: "fbbf24" },
+                  { token: "keyword", foreground: "f472b6" },
                   { token: "operator", foreground: "94e2d5" },
-                  { token: "delimiter", foreground: "cdd6f4" },
-                  { token: "tag", foreground: "f38ba8" },
-                  { token: "attribute.name", foreground: "94e2d5" },
-                  { token: "attribute.value", foreground: "a6e3a1" },
+                  { token: "delimiter", foreground: "94a3b8" },
+                  { token: "tag", foreground: "f472b6" },
+                  { token: "attribute.name", foreground: "89dceb" },
+                  { token: "attribute.value", foreground: "4ade80" },
                   { token: "type", foreground: "fab387" },
-                  { token: "identifier", foreground: "cdd6f4" },
-                  { token: "predefined", foreground: "89b4fa" },
-                  { token: "variable", foreground: "cdd6f4" },
-                  { token: "function", foreground: "89b4fa" },
+                  { token: "identifier", foreground: "f1f5f9" },
+                  { token: "predefined", foreground: "60a5fa" },
+                  { token: "variable", foreground: "f1f5f9" },
+                  { token: "function", foreground: "60a5fa" },
                   { token: "constant", foreground: "fab387" },
-                  { token: "property", foreground: "89dceb" },
-                  { token: "namespace", foreground: "f5c2e7" },
+                  { token: "property", foreground: "818cf8" },
                 ],
                 colors: {
-                  "editor.background": "#1e1e2e",
-                  "editor.foreground": "#cdd6f4",
-                  "editor.lineHighlightBackground": "#ffffff0a",
-                  "editor.selectionBackground": "#585b70",
-                  "editorCursor.foreground": "#f5e0dc",
-                  "editorLineNumber.foreground": "#7f849c",
-                  "editorLineNumber.activeForeground": "#cdd6f4",
-                  "editorGutter.background": "#1e1e2e",
-                  "editorBracketMatch.background": "#1e1e2e",
-                  "editorBracketMatch.border": "#94e2d5",
+                  "editor.background": "#020617",
+                  "editor.foreground": "#f1f5f9",
+                  "editor.lineHighlightBackground": "#1e293b50",
+                  "editor.selectionBackground": "#33415580",
+                  "editorCursor.foreground": "#f472b6",
+                  "editorLineNumber.foreground": "#475569",
+                  "editorLineNumber.activeForeground": "#94a3b8",
+                  "editorGutter.background": "#020617",
+                  "editorBracketMatch.background": "#0f172a",
+                  "editorBracketMatch.border": "#f472b6",
+                  "editor.selectionHighlightBackground": "#33415550",
+                  "editorWidget.background": "#0f172a",
+                  "editorWidget.border": "#334155",
+                  "editorSuggestWidget.background": "#0f172a",
+                  "editorSuggestWidget.border": "#334155",
+                  "editorSuggestWidget.selectedBackground": "#1e293b",
+                  "editorHoverWidget.background": "#0f172a",
+                  "editorHoverWidget.border": "#334155",
                 },
               });
             }}
             onMount={(editor, monaco) => {
-              monaco.editor.setTheme("catppuccin-mocha");
+              monaco.editor.setTheme("modern-dark");
               syncTypes(monaco);
 
               const disposeNavigation = wireFileNavigation(

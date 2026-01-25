@@ -93,14 +93,14 @@ export const useBuild = (
         }
       } catch (e: unknown) {
         console.error("Failed to process stats.json:", e);
-        const errorMessage = e instanceof Error ? e.message : String(e);
+        const errorMessage = e instanceof Error ? e.message : (typeof e === "object" && e !== null ? "Build Processing Error" : String(e));
         setError(
           `Build succeeded, but failed to display stats: ${errorMessage}`,
         );
       }
     } catch (e: unknown) {
       console.error("Build failed: ", e);
-      const errorMessage = e instanceof Error ? e.message : String(e);
+      const errorMessage = e instanceof Error ? e.message : (typeof e === "object" && e !== null ? "Build Error" : String(e));
       setError(`Build failed: ${errorMessage}`);
     } finally {
       stopBuildTimer();

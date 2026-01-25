@@ -61,9 +61,9 @@ export const useDev = (
 
   const startDev = useCallback(async () => {
     if (!project || isDevMode || isStarting.current) return;
-    
+
     isStarting.current = true;
-    
+
     setError("");
     setBuildProgress(0);
     setBuildMessage("Starting Dev...");
@@ -83,7 +83,8 @@ export const useDev = (
         if (result.issues && result.issues.length > 0) {
           const firstError = result.issues.find((i: any) => i.severity === "error");
           if (firstError) {
-            setError(firstError.message);
+            const message = (firstError as any).message;
+            setError(typeof message === "string" ? message : "Dev Build Error");
           }
         }
 
@@ -99,19 +100,16 @@ export const useDev = (
               onPreviewReady(previewUrl);
             }
           }
-          
+
           onBuildComplete?.();
         });
-
-        // Match utooweb-demo: set building true for next watch trigger
-        setIsBuilding(true);
       });
 
       // No longer notifying onPreviewReady here, moved inside the first successful build completion callback above.
 
     } catch (e: unknown) {
       console.error("Failed to start Dev:", e);
-      const errorMessage = e instanceof Error ? e.message : String(e);
+      const errorMessage = e instanceof Error ? e.message : (typeof e === "object" && e !== null ? "Dev Mode Error" : String(e));
       setError(`Failed to start Dev: ${errorMessage}`);
       setIsDevMode(false);
       isStarting.current = false;

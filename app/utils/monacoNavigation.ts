@@ -11,7 +11,8 @@ export const wireFileNavigation = (
     // Keep signature flexible to be compatible across versions
     openCodeEditor: async (_source: any, resource: any) => {
       if (resource?.scheme === "file") {
-        const cleanPath = String(resource.path || "").replace(/^\/+/, "");
+        const path = resource.path || "";
+        const cleanPath = (typeof path === "string" ? path : String(path)).replace(/^\/+/, "");
         onSwitchFile(cleanPath);
         return true;
       }
@@ -23,7 +24,8 @@ export const wireFileNavigation = (
     const model = editor.getModel?.();
     const uri = model?.uri;
     if (uri && uri.scheme === "file") {
-      const cleanPath = String(uri.path || "").replace(/^\/+/, "");
+      const path = uri.path || "";
+      const cleanPath = (typeof path === "string" ? path : String(path)).replace(/^\/+/, "");
       onSwitchFile(cleanPath);
     }
   });
@@ -31,9 +33,9 @@ export const wireFileNavigation = (
   return () => {
     try {
       modelSub?.dispose?.();
-    } catch {}
+    } catch { }
     try {
       openerDispose?.dispose?.();
-    } catch {}
+    } catch { }
   };
 };

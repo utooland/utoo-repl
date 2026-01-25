@@ -1,5 +1,6 @@
-import { FolderInput, Trash2 } from "lucide-react";
+import { FolderUp, Eraser, Play, Zap, Terminal } from "lucide-react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -116,12 +117,12 @@ const Project = () => {
     onPreviewReady: handleBuildSuccess,
   });
 
-  const currentIsBuilding = isDevMode ? isDevBuilding : isBuilding;
-  const currentBuildProgress = isDevMode ? devProgress : buildProgress;
-  const currentBuildMessage = isDevMode ? devMessage : buildMessage;
-  const currentBuildTime = isDevMode ? devTime : buildTime;
+  const currentIsBuilding = isBuilding || isDevBuilding;
+  const currentBuildProgress = isDevBuilding ? devProgress : buildProgress;
+  const currentBuildMessage = isDevBuilding ? devMessage : buildMessage;
+  const currentBuildTime = isDevBuilding ? devTime : buildTime;
   const currentBuildError =
-    projectError || fileContentError || (isDevMode ? devError : buildError);
+    projectError || fileContentError || buildError || devError;
 
   const error = currentBuildError;
 
@@ -209,11 +210,12 @@ const Project = () => {
       type="button"
       onClick={handleBuild}
       disabled={isBuilding || isDevMode || !project}
-      variant="default"
+      variant="outline"
       size="sm"
-      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 mr-2"
+      className="tech-border-neon bg-purple-500/5 text-purple-400 border-purple-500/30 hover:bg-purple-500/15 transition-all duration-300 font-mono text-[10px] uppercase tracking-wider h-7 min-w-[72px] px-2"
     >
-      {isBuilding ? "Building..." : "Build"}
+      <Play className="w-3 h-3 mr-1 opacity-80 fill-purple-400 flex-shrink-0" />
+      <span className="truncate">{isBuilding ? "Compiling" : "Build"}</span>
     </Button>
   );
 
@@ -225,12 +227,16 @@ const Project = () => {
       variant={isDevMode ? "destructive" : "outline"}
       size="sm"
       className={
-        isDevMode
-          ? ""
-          : "border-purple-500 text-purple-400 hover:bg-purple-500/10"
+        cn(
+          "font-mono text-[10px] uppercase tracking-wider h-7 min-w-[72px] px-2 transition-all duration-300",
+          isDevMode
+            ? "bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500/30 shadow-[0_0_15px_-3px_rgba(239,68,68,0.3)]"
+            : "border-cyan-500/30 bg-cyan-400/5 text-cyan-400 hover:bg-cyan-400/15"
+        )
       }
     >
-      {isDevMode ? "Stop Dev" : "Dev"}
+      <Zap className={cn("w-3 h-3 mr-1 flex-shrink-0", isDevMode ? "fill-red-400" : "fill-cyan-400")} />
+      {isDevMode ? "Stop" : "Dev"}
     </Button>
   );
 
@@ -241,9 +247,9 @@ const Project = () => {
       variant="ghost"
       size="icon"
       title="Import Folder"
-      className="text-slate-400 hover:text-white mr-2"
+      className="text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all w-8 h-8"
     >
-      <FolderInput className="w-4 h-4" />
+      <FolderUp className="w-4 h-4" />
     </Button>
   );
 
@@ -253,89 +259,90 @@ const Project = () => {
       disabled={!project}
       variant="ghost"
       size="icon"
-      title="Clear All Files"
-      className="text-slate-400 hover:text-red-400 mr-2"
+      title="Clear Project"
+      className="text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all w-8 h-8"
     >
-      <Trash2 className="w-4 h-4" />
+      <Eraser className="w-4 h-4" />
     </Button>
   );
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-foreground relative overflow-hidden">
-      {/* Tech-style background decoration */}
-      <div className="absolute inset-0 bg-gradient-radial from-purple-500/10 via-transparent to-transparent pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/5 to-transparent pointer-events-none z-0" />
+    <div className="h-screen flex flex-col bg-[#020617] text-foreground relative overflow-hidden font-sans">
+      {/* High-Tech Dynamic Background */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {/* Deep Grid Base */}
+        <div className="absolute inset-0 tech-grid opacity-20" />
+        <div className="absolute inset-0 tech-grid-faint opacity-10" />
+        
+        {/* Animated Scanline */}
+        <div className="scanline" />
+
+        {/* Dynamic Glows */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-pink-600/10 blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[20%] left-[30%] w-[30%] h-[30%] rounded-full bg-blue-600/5 blur-[100px] animate-pulse-slow" style={{ animationDelay: '4s' }} />
+      </div>
 
       {/* Main content area */}
-      <div className="grid grid-cols-[minmax(300px,1fr)_minmax(320px,1.6fr)_minmax(320px,1.4fr)] h-[calc(100vh-3rem)]">
+      <div className="flex-1 grid grid-cols-[minmax(280px,0.8fr)_minmax(400px,2fr)_minmax(320px,1.2fr)] relative z-10">
         <Panel
-          title="Project"
+          title="Explorer"
           actions={
-            <div className="flex items-center">
+            <div className="flex items-center gap-1.5">
               {clearButton}
               {importButton}
+              <div className="w-[1px] h-4 bg-white/10 mx-1" />
               {buildButton}
               {devButton}
             </div>
           }
         >
           {error && (
-            <p style={{ textAlign: "center", color: "#ef4444" }}>{error}</p>
+            <div className="m-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <p className="text-xs text-center color-[#ef4444] leading-relaxed">
+                {typeof error === "string" ? error : ((error as any)?.message || "An unknown error occurred")}
+              </p>
+            </div>
           )}
           {(isLoading ||
             (initProgress !== undefined &&
               initProgress > 0 &&
               initProgress < 100)) && (
-            <div className="mb-4 px-4">
+            <div className="px-4 py-3 bg-white/5 border-b border-white/5 animate-in fade-in duration-300">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">
-                  {initMessage || "Initializing project..."}
+                <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+                  {initMessage || "Booting Project..."}
                 </span>
                 <Timer time={initTime} format="seconds" />
               </div>
               <Progress
                 value={initProgress || 0}
-                className="h-1.5 bg-secondary/20"
-              />
-            </div>
-          )}
-          {(currentIsBuilding ||
-            (currentBuildProgress !== undefined &&
-              currentBuildProgress > 0)) && (
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-200 font-medium">
-                  {currentBuildMessage || "Building project..."}
-                </span>
-                <Timer time={currentBuildTime} format="seconds" />
-              </div>
-              <Progress
-                value={currentBuildProgress || 0}
-                className="h-1.5 bg-secondary/20"
+                className="h-1 bg-purple-500/20"
               />
             </div>
           )}
           {!isLoading && !error && (
-            <ul className="flex flex-col gap-1 px-4 py-2 items-start">
-              {memoizedFileTree.map((item) => (
-                <FileTreeItem
-                  key={item.fullName}
-                  item={item}
-                  onFileClick={openFile}
-                  onDirectoryExpand={
-                    item.type === "directory"
-                      ? handleDirectoryExpand
-                      : undefined
-                  }
-                  selectedFile={selectedFilePath} // Pass the selectedFilePath state here
-                  onContextMenu={handleContextMenu}
-                  creatingItem={creatingItem}
-                  onCreateConfirm={handleCreateConfirm}
-                  onCreateCancel={cancelCreating}
-                />
-              ))}
-            </ul>
+            <div className="pb-8">
+              <ul className="flex flex-col gap-0.5">
+                {memoizedFileTree.map((item) => (
+                  <FileTreeItem
+                    key={item.fullName}
+                    item={item}
+                    onFileClick={openFile}
+                    onDirectoryExpand={
+                      item.type === "directory"
+                        ? handleDirectoryExpand
+                        : undefined
+                    }
+                    selectedFile={selectedFilePath}
+                    onContextMenu={handleContextMenu}
+                    creatingItem={creatingItem}
+                    onCreateConfirm={handleCreateConfirm}
+                    onCreateCancel={cancelCreating}
+                  />
+                ))}
+              </ul>
+            </div>
           )}
         </Panel>
 
@@ -353,7 +360,7 @@ const Project = () => {
           />
         )}
 
-        <Panel title="Editor" contentStyle={{ paddingTop: "0.5rem" }}>
+        <Panel title="Editor">
           <Editor
             openFiles={openFiles}
             activeFile={selectedFilePath}
@@ -368,7 +375,7 @@ const Project = () => {
           />
         </Panel>
 
-        <Panel title="Preview" contentStyle={{ padding: 0 }}>
+        <Panel title="Live Preview">
           <Preview
             ref={previewRef}
             url={previewUrl}
@@ -386,40 +393,54 @@ const Project = () => {
         </Panel>
       </div>
 
-      <div className="flex items-center justify-between px-6 py-2 bg-card/20 backdrop-blur-sm border-t border-border/30">
-        <div className="flex items-center gap-2">
-          <Image
-            src="https://avatars.githubusercontent.com/u/217533135?s=200&v=4"
-            alt="Utoo Logo"
-            width={20}
-            height={20}
-            className="rounded-md shadow-lg"
-          />
-          <h1 className="text-md font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Utoo REPL
-          </h1>
+      <footer className="h-10 flex items-center justify-between px-4 glass-header z-20 relative">
+        <div className="flex items-center gap-3">
+          <div className="p-1 px-1.5 rounded-md bg-white/5 border border-white/10 tech-border-neon">
+            <Image
+              src="https://avatars.githubusercontent.com/u/217533135?s=200&v=4"
+              alt="Utoo Logo"
+              width={14}
+              height={14}
+              className="rounded-sm opacity-90"
+            />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-xs font-bold tracking-tight text-futuristic uppercase">
+              UTOO REPL
+            </h1>
+            <p className="text-[10px] text-slate-500 font-medium tracking-wide">
+              High-performance browser-based development laboratory
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>Powered by</span>
-          <a
-            href="https://npmjs.org/@utoo/web"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-primary hover:text-primary/80 transition-colors"
-          >
-            @utoo/web
-          </a>
-          <span>and</span>
-          <a
-            href="https://nextjs.org/docs/app/api-reference/turbopack"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-primary hover:text-primary/80 transition-colors"
-          >
-            turbopack
-          </a>
+        
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="tech-tag text-cyan-500 border-cyan-500/20">System Online</div>
+          </div>
+
+          <div className="w-[1px] h-3 bg-white/10" />
+
+          <div className="flex items-center gap-2 text-[10px] font-medium tracking-wide text-slate-500 uppercase">
+            <span>Core</span>
+            <div className="flex items-center gap-1 font-mono">
+              <a href="https://npmjs.org/@utoo/web" target="_blank" className="text-slate-300 hover:neon-text-cyan transition-colors">@utoo/web</a>
+              <span className="text-slate-700">::</span>
+              <a href="https://nextjs.org" target="_blank" className="text-slate-300 hover:neon-text-purple transition-colors">turbopack</a>
+            </div>
+          </div>
+          
+          <div className="w-[1px] h-3 bg-white/10" />
+          
+          <div className="flex items-center gap-2 text-[10px] font-medium tracking-wide text-slate-400">
+            <span className="text-slate-600 font-mono text-[8px]">HOST//</span>
+            <a href="https://vercel.com" target="_blank" className="flex items-center gap-1 hover:text-white transition-colors">
+              <span className="font-bold text-slate-200 uppercase tracking-tighter">Vercel</span>
+            </a>
+          </div>
         </div>
-      </div>
+      </footer>
+
       <ConfirmDialog
         isOpen={dialogState.isOpen}
         title={dialogState.title}

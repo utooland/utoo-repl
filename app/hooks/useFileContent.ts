@@ -59,7 +59,7 @@ export const useFileContent = (
           setPreviewUrl(`${location.origin}${serviceWorkerScope}/${filePath}`);
         }
       } catch (e: unknown) {
-        const errorMessage = e instanceof Error ? e.message : String(e);
+        const errorMessage = e instanceof Error ? e.message : (typeof e === "object" && e !== null ? "File Read Error" : String(e));
         toast.error(`Error reading file: ${errorMessage}`);
       }
     },
@@ -96,7 +96,7 @@ export const useFileContent = (
             updateFileState(filePath, { isDirty: false, isSaving: false });
           } catch (e: unknown) {
             setError(
-              `Error saving file: ${e instanceof Error ? e.message : String(e)}`,
+              `Error saving file: ${e instanceof Error ? e.message : (typeof e === "object" && e !== null ? "Save Error" : String(e))}`,
             );
             updateFileState(filePath, { isSaving: false });
             return;
@@ -148,7 +148,7 @@ export const useFileContent = (
       updateFileState(selectedFilePath, { isDirty: false, isSaving: false });
     } catch (e: unknown) {
       setError(
-        `Error saving file: ${e instanceof Error ? e.message : String(e)}`,
+        `Error saving file: ${e instanceof Error ? e.message : (typeof e === "object" && e !== null ? "Manual Save Error" : String(e))}`,
       );
       updateFileState(selectedFilePath, { isSaving: false });
     }

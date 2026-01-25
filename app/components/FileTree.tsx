@@ -43,9 +43,15 @@ const InlineInput: React.FC<{
 
   return (
     <div
-      className="flex items-center py-1.5 px-2 rounded-md w-full min-h-[2.25rem] animate-in fade-in slide-in-from-top-1 duration-150"
-      style={{ paddingLeft: `${depth * 1}rem` }}
+      className="flex items-center py-1.5 px-2 rounded-md w-full min-h-[2.25rem] animate-in fade-in slide-in-from-top-1 duration-150 relative"
+      style={{ paddingLeft: `${depth * 1.5}rem` }}
     >
+      {depth > 0 && (
+        <div
+          className="absolute left-0 top-0 bottom-0 border-l border-slate-700/50"
+          style={{ left: `${(depth - 0.5) * 1.5}rem` }}
+        />
+      )}
       <div className="flex items-center gap-2 flex-1 min-h-[1.25rem]">
         <div className="w-4 h-4 flex-shrink-0" />
         {type === "folder" ? (
@@ -80,10 +86,11 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
   const [isExpanded, setIsExpanded] = useState(item.fullName === ".");
 
   const isSelected = selectedFile && selectedFile === item.fullName;
-  const depth = item.fullName.split("/").length;
+  const isRoot = item.fullName === ".";
+  const depth = isRoot ? 0 : item.fullName.split("/").length;
+  
   const shouldShowInput =
     creatingItem?.parentPath === item.fullName && item.type === "directory";
-  const isRoot = item.fullName === ".";
 
   const handleToggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -121,19 +128,19 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
   }, [shouldShowInput, isExpanded]);
 
   return (
-    <li role="none" className="flex flex-col text-sm w-full">
+    <li role="none" className="flex flex-col text-sm w-full relative">
       <div
         role="treeitem"
         aria-selected={isSelected}
         aria-expanded={item.type === "directory" ? isExpanded : undefined}
         tabIndex={0}
         className={cn(
-          "flex items-center py-1.5 px-2 rounded-md cursor-pointer transition-colors duration-150 w-full min-h-[2.25rem] select-none focus:outline-none focus:ring-1 focus:ring-purple-500/50",
+          "flex items-center py-1.5 px-2 cursor-pointer transition-colors duration-150 w-full min-h-[2.25rem] select-none focus:outline-none focus:ring-1 focus:ring-purple-500/50 relative",
           isSelected
             ? "bg-purple-500/20 text-white"
             : "text-slate-300 hover:bg-slate-700/50",
-          isRoot &&
-            "sticky top-0 z-20 bg-gradient-to-r from-slate-800/95 to-slate-900/95 backdrop-blur-md border-b border-purple-500/30 shadow-lg",
+          !isRoot && "rounded-md mx-1 w-[calc(100%-0.5rem)]",
+          isRoot && "font-bold text-slate-100 border-b border-white/5 bg-white/5 mb-1 rounded-none",
         )}
         onClick={handleItemClick}
         onKeyDown={(e) => {
@@ -162,8 +169,15 @@ export const FileTreeItem: React.FC<FileTreeItemProps> = ({
           e.stopPropagation();
           onContextMenu?.(e, item);
         }}
-        style={{ paddingLeft: `${depth * 1}rem` }}
+        style={{ paddingLeft: `${depth * 1.5}rem` }}
       >
+        {/* Indentation Guide Line */}
+        {depth > 0 && (
+          <div 
+            className="absolute left-0 top-0 bottom-0 border-l border-slate-700/50"
+            style={{ left: `${(depth - 0.5) * 1.5}rem` }}
+          />
+        )}
         <div className="flex items-center gap-2 flex-1 min-h-[1.25rem]">
           {item.type === "directory" ? (
             <ChevronRight

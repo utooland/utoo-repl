@@ -1,6 +1,38 @@
 import { Project as UtooProject } from "@utoo/web";
 import { demoFiles } from "../demoFiles";
 
+/**
+ * Creates a safe wrapper around the UtooProject instance (which is a Comlink Proxy).
+ * React 19 dev-mode logging attempts to inspect/serialize objects, which can cause
+ * "Cannot convert object to primitive value" errors when it hits a Comlink Proxy.
+ * This manual bridge provides a plain object that doesn't trigger Proxy traps
+ * for symbols or unexpected property lookups.
+ */
+export const createSafeProject = (project: UtooProject): UtooProject => {
+  if (!project) return project;
+
+  const safeProject = {
+    installServiceWorker: () => project.installServiceWorker(),
+    readFile: (path: string, options?: any) => project.readFile(path, options),
+    writeFile: (path: string, content: string | Uint8Array) => project.writeFile(path, content),
+    mkdir: (path: string, options?: any) => project.mkdir(path, options),
+    rmdir: (path: string, options?: any) => project.rmdir(path, options),
+    readdir: (path: string) => project.readdir(path),
+    install: (packageLock: string) => project.install(packageLock),
+    build: () => project.build(),
+    dev: (callback: (result: any) => void) => project.dev(callback),
+    connectHmrIframe: (iframe: HTMLIFrameElement) => project.connectHmrIframe(iframe),
+
+    // Explicitly define common inspection properties to avoid Proxy triggers
+    toString: () => "[SafeUtooProject]",
+    toJSON: () => "[SafeUtooProject]",
+    [Symbol.toStringTag]: "UtooProject",
+  };
+
+  // Prevent extensions and ensure it stays a plain-ish object
+  return Object.freeze(safeProject) as unknown as UtooProject;
+};
+
 const projectName = "/utooweb-demo";
 export const serviceWorkerScope = "/preview";
 
@@ -83,7 +115,7 @@ const initUtooProject = async (project: UtooProject): Promise<void> => {
       // Ensure directory exists
       if (filePath.includes("/")) {
         const dir = filePath.substring(0, filePath.lastIndexOf("/"));
-        await project.mkdir(dir, { recursive: true }).catch(() => {});
+        await project.mkdir(dir, { recursive: true }).catch(() => { });
       }
 
       await project.writeFile(filePath, content);

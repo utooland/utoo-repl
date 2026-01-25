@@ -37,14 +37,13 @@ const nextConfig: NextConfig = {
       config.output.chunkFilename = (pathData) => {
         return isServer
           ? "[name].js"
-          : `static/chunks/${
-              dev ||
-              ["worker", "threadWorker", "serviceWorker"].includes(
-                pathData.chunk.name,
-              )
-                ? "[name]"
-                : "[name].[contenthash]"
-            }.js`;
+          : `static/chunks/${(dev ||
+            (pathData.chunk?.name && ["worker", "threadWorker", "serviceWorker"].includes(
+              pathData.chunk.name,
+            )))
+            ? "[name]"
+            : "[name].[contenthash]"
+          }.js`;
       };
     }
 
