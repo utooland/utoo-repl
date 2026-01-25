@@ -3,60 +3,45 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
-}
-
-@layer base {
   body {
-    @apply bg-background text-foreground;
+    @apply bg-slate-950 text-slate-100;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-@layer components {
-  .btn-primary-t {
-    @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 border-none;
-  }
+/* Ant Design Input/Select placeholder styling for dark mode */
+.ant-input::placeholder, .ant-select-selection-placeholder {
+  @apply text-slate-600 !important;
+}
 
-  .rich-text-editor .ql-container {
-    min-height: 150px;
+/* Custom Table for Cyber Look */
+.custom-table {
+  .ant-table {
+    @apply !bg-transparent !text-slate-300;
   }
-  .rich-text-editor .ql-editor {
-    min-height: 150px;
+  .ant-table-thead > tr > th {
+    @apply !bg-white/5 !text-slate-500 !border-b !border-white/5 uppercase text-[10px] tracking-widest font-bold;
   }
+  .ant-table-tbody > tr > td {
+    @apply !border-b !border-white/5;
+  }
+  .ant-table-tbody > tr:hover > td {
+    @apply !bg-white/5;
+  }
+}
+
+/* Custom Scrollbar for Demo */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-cyan-500/50;
 }

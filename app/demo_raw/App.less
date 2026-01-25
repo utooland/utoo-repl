@@ -1,198 +1,147 @@
-// 颜色变量
-@primary-color: #1890ff;
-@success-color: #52c41a;
-@warning-color: #faad14;
-@error-color: #f5222d;
-@text-color: #262626;
-@border-color: #d9d9d9;
+// Premium Cyber Theme Variables
+@primary-color: #06b6d4; // Cyan-500
+@accent-color: #a855f7;  // Purple-500
+@bg-darker: #020617;     // Slate-950
+@bg-glass: rgba(15, 23, 42, 0.6);
+@border-glass: rgba(255, 255, 255, 0.05);
+@text-dim: #94a3b8;
 
-// 尺寸变量
-@border-radius: 4px;
-@box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-// 混入
-.flex-center() {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+// Mixins for premium effects
+.glass-morphism() {
+  background: @bg-glass;
+  backdrop-filter: blur(12px);
+  border: 1px solid @border-glass;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.button-style(@color) {
-  padding: 8px 16px;
-  border-radius: @border-radius;
-  background-color: @color;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  
-  &:hover {
-    opacity: 0.8;
-    box-shadow: @box-shadow;
-  }
+.neon-glow(@color) {
+  box-shadow: 0 0 15px -3px fade(@color, 40%);
+  border-color: fade(@color, 50%);
 }
 
-// 全局样式
+// Global Resets
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  color: @text-color;
-  background-color: #fafafa;
+  background-color: @bg-darker;
+  color: #f1f5f9;
+  font-family: 'Inter', -apple-system, sans-serif;
   margin: 0;
-  padding: 0;
+  overflow-x: hidden;
 }
 
-// 容器样式
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
+// Ant Design Overrides
+.ant-layout {
+  background: transparent;
 }
 
-// 卡片样式
-.card {
-  background: white;
-  border-radius: @border-radius;
-  box-shadow: @box-shadow;
-  padding: 24px;
-  margin-bottom: 16px;
-
-  .card-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 12px;
-    color: @text-color;
-  }
-
-  .card-content {
-    font-size: 14px;
-    line-height: 1.6;
-  }
+.ant-layout-header {
+  background: fade(@bg-darker, 80%);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid @border-glass;
+  padding: 0 24px;
 }
 
-// 按钮样式
-.btn {
-  display: inline-block;
-  margin-right: 8px;
-  margin-bottom: 8px;
+.ant-menu {
+  background: transparent;
+  border-bottom: none;
   
-  &-primary {
-    .button-style(@primary-color);
-  }
-
-  &-success {
-    .button-style(@success-color);
-  }
-
-  &-warning {
-    .button-style(@warning-color);
-  }
-
-  &-danger {
-    .button-style(@error-color);
-  }
-}
-
-// 表格样式
-.table {
-  width: 100%;
-  border-collapse: collapse;
-
-  th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid @border-color;
-  }
-
-  th {
-    background-color: #fafafa;
-    font-weight: bold;
-  }
-
-  tr:hover {
-    background-color: #f5f5f5;
+  &-item {
+    color: @text-dim !important;
+    font-weight: 500;
+    
+    &-selected {
+      color: @primary-color !important;
+      &::after {
+        border-bottom-color: @primary-color !important;
+      }
+    }
+    
+    &:hover {
+      color: white !important;
+    }
   }
 }
 
-// 栅格系统
-.row {
-  .flex-center();
-  flex-wrap: wrap;
-  margin: -8px;
-}
-
-.col {
-  padding: 8px;
-  
-  &-12 { width: 100%; }
-  &-6 { width: 50%; }
-  &-4 { width: 33.333%; }
-  &-3 { width: 25%; }
-}
-
-// 栅格项样式
-.grid-item {
-  color: white;
-  padding: 20px;
-  text-align: center;
-  border-radius: @border-radius;
-  font-weight: 500;
-  
-  &-primary {
-    background: @primary-color;
-  }
-  
-  &-success {
-    background: @success-color;
-  }
-  
-  &-warning {
-    background: @warning-color;
-  }
-  
-  &-danger {
-    background: @error-color;
-  }
-}
-
-// 按钮组容器
-.button-group {
-  margin-bottom: 16px;
-}
-
-// Layout 演示样式
-.layout-demo {
-  border-radius: 8px;
+// Custom Components
+.cyber-card {
+  .glass-morphism();
+  padding: 1.5rem;
+  border-radius: 12px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
   overflow: hidden;
-  width: calc(50% - 8px);
-  max-width: calc(50% - 8px);
-  
-  .demo-header {
-    text-align: center;
-    color: #fff;
-    height: 64px;
-    padding-inline: 48px;
-    line-height: 64px;
-    background-color: #4096ff;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, @primary-color, transparent);
+    opacity: 0.3;
   }
-  
-  .demo-content {
-    text-align: center;
-    min-height: 120px;
-    line-height: 120px;
-    color: #fff;
-    background-color: #0958d9;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: fade(@primary-color, 30%);
+    box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+    
+    &::before {
+      opacity: 0.8;
+      animation: scan-line 2s linear infinite;
+    }
   }
-  
-  .demo-sider {
-    text-align: center;
-    line-height: 120px;
-    color: #fff;
-    background-color: #1677ff;
+
+  .title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: @text-dim;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: @border-glass;
+    }
   }
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: linear-gradient(to right, #fff, @text-dim);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes scan-line {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+// Tailwind Utility Connectors
+.btn-cyber {
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   
-  .demo-footer {
-    text-align: center;
-    color: #fff;
-    background-color: #4096ff;
+  &-primary {
+    background: fade(@primary-color, 10%);
+    border: 1px solid fade(@primary-color, 30%);
+    color: @primary-color;
+    
+    &:hover {
+      background: fade(@primary-color, 20%);
+      .neon-glow(@primary-color);
+    }
   }
 }
