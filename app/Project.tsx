@@ -14,6 +14,7 @@ import { Timer } from "./components/Timer";
 import { useBuild } from "./hooks/useBuild";
 import { useConfirmDialog } from "./hooks/useConfirmDialog";
 import { useContextMenu } from "./hooks/useContextMenu";
+import { useDev } from "./hooks/useDev";
 import { useFileContent } from "./hooks/useFileContent";
 import { useFileTree } from "./hooks/useFileTree";
 import { useImportDirectory } from "./hooks/useImportDirectory";
@@ -55,7 +56,19 @@ const Project = () => {
     error: fileContentError,
   } = useFileContent(project, showConfirmDialog);
 
-  const previewRef = useRef<{ reload: () => void }>(null);
+  const previewRef = useRef<{
+    reload: () => void;
+    getIframe: () => HTMLIFrameElement | null;
+  }>(null);
+
+  // HMR iframe connection handler
+  const handleConnectHmrIframe = useCallback(
+    (iframe: HTMLIFrameElement) => {
+      if (!project) return null;
+      return project.connectHmrIframe(iframe);
+    },
+    [project],
+  );
 
   const handleBuildReload = useCallback(() => {
     if (previewRef.current) {
@@ -65,8 +78,10 @@ const Project = () => {
 
   const handleBuildSuccess = useCallback(
     (url: string) => {
-      // Automatically set the preview URL after build is complete
-      setPreviewUrl(url);
+      // Clear URL first to ensure iframe mount/unmount or state reset if URL changed
+      setPreviewUrl("");
+      // Using setTimeout to ensure state cycle for potential flash avoidance or re-mounting
+      setTimeout(() => setPreviewUrl(url), 0);
     },
     [setPreviewUrl],
   );
@@ -86,7 +101,29 @@ const Project = () => {
     handleBuildSuccess,
   );
 
-  const error = projectError || fileContentError || buildError;
+  const {
+    isDevMode,
+    isBuilding: isDevBuilding,
+    startDev,
+    stopDev,
+    error: devError,
+    buildProgress: devProgress,
+    buildMessage: devMessage,
+    buildTime: devTime,
+  } = useDev(project, fileTree, handleDirectoryExpand, {
+    // HMR will handle updates automatically, no need to manually reload
+    onBuildComplete: undefined,
+    onPreviewReady: handleBuildSuccess,
+  });
+
+  const currentIsBuilding = isDevMode ? isDevBuilding : isBuilding;
+  const currentBuildProgress = isDevMode ? devProgress : buildProgress;
+  const currentBuildMessage = isDevMode ? devMessage : buildMessage;
+  const currentBuildTime = isDevMode ? devTime : buildTime;
+  const currentBuildError =
+    projectError || fileContentError || (isDevMode ? devError : buildError);
+
+  const error = currentBuildError;
 
   const memoizedFileTree = useMemo(() => fileTree, [fileTree]);
 
@@ -171,12 +208,29 @@ const Project = () => {
     <Button
       type="button"
       onClick={handleBuild}
-      disabled={isBuilding || !project}
+      disabled={isBuilding || isDevMode || !project}
       variant="default"
       size="sm"
-      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 mr-2"
     >
       {isBuilding ? "Building..." : "Build"}
+    </Button>
+  );
+
+  const devButton = (
+    <Button
+      type="button"
+      onClick={isDevMode ? stopDev : startDev}
+      disabled={isBuilding || !project}
+      variant={isDevMode ? "destructive" : "outline"}
+      size="sm"
+      className={
+        isDevMode
+          ? ""
+          : "border-purple-500 text-purple-400 hover:bg-purple-500/10"
+      }
+    >
+      {isDevMode ? "Stop Dev" : "Dev"}
     </Button>
   );
 
@@ -222,6 +276,7 @@ const Project = () => {
               {clearButton}
               {importButton}
               {buildButton}
+              {devButton}
             </div>
           }
         >
@@ -245,17 +300,18 @@ const Project = () => {
               />
             </div>
           )}
-          {(isBuilding ||
-            (buildProgress !== undefined && buildProgress > 0)) && (
+          {(currentIsBuilding ||
+            (currentBuildProgress !== undefined &&
+              currentBuildProgress > 0)) && (
             <div className="p-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-slate-200 font-medium">
-                  {buildMessage || "Building project..."}
+                  {currentBuildMessage || "Building project..."}
                 </span>
-                <Timer time={buildTime} format="seconds" />
+                <Timer time={currentBuildTime} format="seconds" />
               </div>
               <Progress
-                value={buildProgress || 0}
+                value={currentBuildProgress || 0}
                 className="h-1.5 bg-secondary/20"
               />
             </div>
@@ -317,13 +373,15 @@ const Project = () => {
             ref={previewRef}
             url={previewUrl}
             isLoading={isLoading}
-            isBuilding={isBuilding}
+            isBuilding={currentIsBuilding}
+            isDevMode={isDevMode}
             initProgress={initProgress}
             initMessage={initMessage}
             initTime={initTime}
-            buildProgress={buildProgress}
-            buildMessage={buildMessage}
-            buildTime={buildTime}
+            buildProgress={currentBuildProgress}
+            buildMessage={currentBuildMessage}
+            buildTime={currentBuildTime}
+            onIframeReady={handleConnectHmrIframe}
           />
         </Panel>
       </div>

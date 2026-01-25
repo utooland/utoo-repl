@@ -2,7 +2,7 @@ import React, { type FC } from "react";
 
 const TailwindExamples: FC = () => {
   return (
-    <div className="p-8 bg-slate-50 min-h-screen space-y-12">
+    <div className="space-y-12">
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-slate-800">
           Advanced Tailwind CSS v3 Examples

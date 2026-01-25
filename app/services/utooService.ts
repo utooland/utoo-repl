@@ -23,17 +23,10 @@ export const initializeProject = async (onProgress?: ProgressCallback) => {
   onProgress?.(10, "Initializing service worker...");
   await projectInstance.installServiceWorker();
 
-  onProgress?.(20, "Creating project files...");
-  const hasUtooPack = await projectInstance
-    .readFile("utoopack.json")
-    .catch(() => {
-      return false;
-    });
-  if (hasUtooPack === false) {
-    await initUtooProject(projectInstance);
-  }
+  onProgress?.(20, "Syncing project files...");
+  await initUtooProject(projectInstance);
 
-  onProgress?.(30, "Project files created successfully!");
+  onProgress?.(30, "Project files synchronized successfully!");
 
   return projectInstance;
 };
@@ -83,11 +76,16 @@ export const installDependencies = async (
 };
 
 const initUtooProject = async (project: UtooProject): Promise<void> => {
-  await project.mkdir("src");
-
   for (const filePath in demoFiles) {
     if (Object.hasOwn(demoFiles, filePath)) {
       const content = demoFiles[filePath as keyof typeof demoFiles];
+
+      // Ensure directory exists
+      if (filePath.includes("/")) {
+        const dir = filePath.substring(0, filePath.lastIndexOf("/"));
+        await project.mkdir(dir, { recursive: true }).catch(() => {});
+      }
+
       await project.writeFile(filePath, content);
     }
   }
