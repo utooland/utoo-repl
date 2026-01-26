@@ -126,6 +126,15 @@ const Project = () => {
 
   const error = currentBuildError;
 
+  // Auto-refresh preview when build error is resolved
+  const prevErrorRef = useRef(error);
+  useEffect(() => {
+    if (prevErrorRef.current && !error && (isDevMode || previewUrl)) {
+      handleBuildReload();
+    }
+    prevErrorRef.current = error;
+  }, [error, isDevMode, previewUrl, handleBuildReload]);
+
   const memoizedFileTree = useMemo(() => fileTree, [fileTree]);
 
   const {
@@ -297,13 +306,6 @@ const Project = () => {
             </div>
           }
         >
-          {error && (
-            <div className="m-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-              <p className="text-xs text-center color-[#ef4444] leading-relaxed">
-                {typeof error === "string" ? error : ((error as any)?.message || "An unknown error occurred")}
-              </p>
-            </div>
-          )}
           {(isLoading ||
             (initProgress !== undefined &&
               initProgress > 0 &&
@@ -321,7 +323,7 @@ const Project = () => {
               />
             </div>
           )}
-          {!isLoading && !error && (
+          {!isLoading && (
             <div className="pb-8">
               <ul className="flex flex-col gap-0.5">
                 {memoizedFileTree.map((item) => (
@@ -388,6 +390,7 @@ const Project = () => {
             buildProgress={currentBuildProgress}
             buildMessage={currentBuildMessage}
             buildTime={currentBuildTime}
+            error={error}
             onIframeReady={handleConnectHmrIframe}
           />
         </Panel>

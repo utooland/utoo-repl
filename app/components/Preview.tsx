@@ -13,6 +13,7 @@ interface PreviewProps {
   buildProgress?: number;
   buildMessage?: string;
   buildTime?: number;
+  error?: string | Error | null;
   onIframeReady?: (iframe: HTMLIFrameElement) => { close: () => void } | null;
 }
 
@@ -31,6 +32,7 @@ export const Preview = forwardRef<
     buildProgress,
     buildMessage,
     buildTime,
+    error,
     onIframeReady,
   } = props;
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -105,6 +107,30 @@ export const Preview = forwardRef<
             <p className="text-xs text-slate-500 max-w-[240px] leading-relaxed">
               Launch the compiler to generate artifacts and initialize the live preview system.
             </p>
+          </div>
+        )}
+
+        {/* Error Overlay */}
+        {error && (
+          <div className="absolute inset-0 z-[60] flex flex-col justify-center items-center text-center p-8 bg-red-950/90 backdrop-blur-xl animate-in fade-in duration-300">
+            <div className="mb-6 p-4 rounded-full bg-red-900/30 border border-red-500/50 glow-red">
+               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            </div>
+            <div className="text-sm font-bold text-red-400 uppercase tracking-[0.2em] mb-4">
+              Build Error Detected
+            </div>
+            <div className="w-full max-w-[480px] p-4 bg-black/40 rounded-lg border border-red-500/20 font-mono text-left overflow-auto max-h-[60%]">
+              <pre className="text-xs text-red-300 whitespace-pre-wrap break-words leading-relaxed">
+                {typeof error === "string" ? error : ((error as any)?.message || "An unknown error occurred")}
+              </pre>
+            </div>
+            <div className="mt-8 px-6 text-[10px] text-slate-400 max-w-[300px] leading-relaxed border-t border-white/5 pt-6">
+              <p>The compiler encountered an issue. Fix the errors in your code to automatically resume the development session.</p>
+            </div>
           </div>
         )}
 

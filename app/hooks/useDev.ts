@@ -85,7 +85,11 @@ export const useDev = (
           if (firstError) {
             const message = (firstError as any).message;
             setError(typeof message === "string" ? message : "Dev Build Error");
+          } else {
+            setError("");
           }
+        } else {
+          setError("");
         }
 
         // Process stats and update index.html on every build
