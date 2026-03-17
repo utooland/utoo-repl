@@ -74,39 +74,41 @@ export const useDev = (
       setIsBuilding(true);
 
       // Start Dev mode
-      project.dev((result) => {
-        setIsBuilding(false);
-        setBuildProgress(100);
-        setBuildMessage(`Build completed`);
-        stopBuildTimer();
+      project.dev({
+        onUpdate: (result) => {
+          setIsBuilding(false);
+          setBuildProgress(100);
+          setBuildMessage(`Build completed`);
+          stopBuildTimer();
 
-        if (result.issues && result.issues.length > 0) {
-          const firstError = result.issues.find((i: any) => i.severity === "error");
-          if (firstError) {
-            const message = (firstError as any).message;
-            setError(typeof message === "string" ? message : "Dev Build Error");
+          if (result.issues && result.issues.length > 0) {
+            const firstError = result.issues.find((i: any) => i.severity === "error");
+            if (firstError) {
+              const message = (firstError as any).message;
+              setError(typeof message === "string" ? message : "Dev Build Error");
+            } else {
+              setError("");
+            }
           } else {
             setError("");
           }
-        } else {
-          setError("");
-        }
 
-        // Process stats and update index.html on every build
-        processBuildStats().then(() => {
-          if (!isDevMode) {
-            setIsDevMode(true);
-            isStarting.current = false;
+          // Process stats and update index.html on every build
+          processBuildStats().then(() => {
+            if (!isDevMode) {
+              setIsDevMode(true);
+              isStarting.current = false;
 
-            // ONLY notify initial preview ready AFTER the first build artifact (index.html) is generated
-            if (onPreviewReady) {
-              const previewUrl = `${location.origin}/preview/dist/index.html`;
-              onPreviewReady(previewUrl);
+              // ONLY notify initial preview ready AFTER the first build artifact (index.html) is generated
+              if (onPreviewReady) {
+                const previewUrl = `${location.origin}/preview/dist/index.html`;
+                onPreviewReady(previewUrl);
+              }
             }
-          }
 
-          onBuildComplete?.();
-        });
+            onBuildComplete?.();
+          });
+        },
       });
 
       // No longer notifying onPreviewReady here, moved inside the first successful build completion callback above.

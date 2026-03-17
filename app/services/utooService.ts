@@ -20,7 +20,7 @@ export const createSafeProject = (project: UtooProject): UtooProject => {
     readdir: (path: string) => project.readdir(path),
     install: (packageLock: string) => project.install(packageLock),
     build: () => project.build(),
-    dev: (callback: (result: any) => void) => project.dev(callback),
+    dev: (options: { onUpdate?: (result: any) => void }) => project.dev(options),
     connectHmrIframe: (iframe: HTMLIFrameElement) => project.connectHmrIframe(iframe),
 
     // Explicitly define common inspection properties to avoid Proxy triggers
