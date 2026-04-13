@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import path from "node:path";
 
 const nextConfig: NextConfig = {
   images: {
@@ -30,24 +29,6 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
-  },
-  webpack: (config, { isServer, dev }) => {
-    if (!isServer && !dev) {
-      config.optimization.splitChunks = false;
-      config.output.chunkFilename = (pathData) => {
-        return isServer
-          ? "[name].js"
-          : `static/chunks/${(dev ||
-            (pathData.chunk?.name && ["worker", "threadWorker", "serviceWorker"].includes(
-              pathData.chunk.name,
-            )))
-            ? "[name]"
-            : "[name].[contenthash]"
-          }.js`;
-      };
-    }
-
-    return config;
   },
 };
 
