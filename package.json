@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
-    "start": "next start --webpack",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "biome check",
     "format": "biome format --write"
   },
@@ -13,7 +13,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-progress": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
-    "@utoo/web": "1.4.3",
+    "@utoo/web": "1.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.542.0",

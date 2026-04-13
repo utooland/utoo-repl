@@ -1,4 +1,7 @@
 import { Project as UtooProject } from "@utoo/web";
+import workerUrl from "@utoo/web/esm/workerInline";
+import threadWorkerUrl from "@utoo/web/esm/threadWorkerInline"
+import loaderWorkerUrl from "@utoo/web/esm/loaderWorkerInline"
 import { demoFiles } from "../demoFiles";
 
 /**
@@ -41,12 +44,16 @@ export type ProgressCallback = (progress: number, message: string) => void;
 export const initializeProject = async (onProgress?: ProgressCallback) => {
   const projectInstance = new UtooProject({
     cwd: projectName,
-    workerUrl: `${location.origin}/_next/static/chunks/worker.js`,
-    threadWorkerUrl: `${location.origin}/_next/static/chunks/threadWorker.js`,
-    loaderWorkerUrl: new URL("@utoo/web/esm/loaderWorker.js", import.meta.url)
-      .href,
+    wasmUrl: new URL(
+      new URL("@utoo/web/esm/utoo/index_bg.wasm", import.meta.url).pathname,
+      location.origin
+    ).href,
+    workerUrl,
+    threadWorkerUrl,
+    loaderWorkerUrl,
     serviceWorker: {
-      url: `${location.origin}/_next/static/chunks/serviceWorker.js`,
+      url: new URL("@utoo/web/esm/serviceWorkerBundle.js", import.meta.url)
+        .href,
       scope: serviceWorkerScope,
     },
     logFilter: new URLSearchParams(location.search).get("logFilter") || "",
