@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    rules: {
+      "./app/demo_raw/**": { loaders: ["raw-loader"], as: "*.js" },
+    },
+  },
   images: {
     remotePatterns: [
       {
