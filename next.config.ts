@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    rules: {
+      // BUG: path-based glob doesn't match files
+      "app/demo_raw/**": { loaders: ["raw-loader"], as: "*.js" },
+    },
+  },
   images: {
     remotePatterns: [
       {
